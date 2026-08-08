@@ -1,0 +1,253 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X, Phone, Mail, GraduationCap, ChevronRight } from "lucide-react";
+import { Button } from "../ui/Button";
+
+interface NavLink {
+  label: string;
+  path: string;
+}
+
+const mainNavLinks: NavLink[] = [
+  { label: "Home", path: "/" },
+  { label: "About Us", path: "/about" },
+  { label: "Academics", path: "/academics" },
+  { label: "Faculty", path: "/faculty" },
+  { label: "Facilities", path: "/facilities" },
+  { label: "Activities", path: "/activities" },
+  { label: "Gallery", path: "/gallery" },
+  { label: "Events", path: "/events" },
+];
+
+const quickLinks: NavLink[] = [
+  { label: "Admissions", path: "/admissions" },
+  { label: "News", path: "/news" },
+  { label: "Contact Us", path: "/contact" },
+];
+
+// Combined list for mobile navigation
+const allLinks = [...mainNavLinks, ...quickLinks];
+
+export const Header: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // Close mobile menu when the route changes (handles browser back/forward too)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+  }
+
+  // Handle header background transition on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  return (
+    <>
+      <header className="w-full fixed top-0 left-0 z-50 transition-all duration-300">
+        {/* Top Information Bar (Desktop Only) */}
+        {!isScrolled && (
+          <div className="hidden lg:flex w-full bg-slate-900 text-slate-300 py-2.5 px-8 justify-between border-b border-slate-800 text-xs">
+            <div className="flex items-center gap-6">
+              <a
+                href="tel:+18005550199"
+                className="flex items-center gap-2 hover:text-amber-400 transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>+1 (800) 555-0199</span>
+              </a>
+              <a
+                href="mailto:info@pinecrestacademy.edu"
+                className="flex items-center gap-2 hover:text-amber-400 transition-colors"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>info@pinecrestacademy.edu</span>
+              </a>
+            </div>
+            <div className="flex items-center gap-6 font-medium">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={`hover:text-amber-400 transition-colors ${
+                    pathname === link.path
+                      ? "text-amber-400 font-bold"
+                      : "text-slate-300"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Main Navbar */}
+        <nav
+          className={`w-full py-4 px-6 md:px-8 flex items-center justify-between transition-all duration-300 ${
+            isScrolled
+              ? "bg-white/90 dark:bg-slate-950/90 shadow-md backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 py-3.5"
+              : "bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-900"
+          }`}
+        >
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-slate-100 dark:to-white flex items-center justify-center text-white dark:text-slate-900 shadow-md transition-transform group-hover:scale-105">
+              <GraduationCap className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-lg md:text-xl tracking-tight text-slate-900 dark:text-white leading-none">
+                PINECREST
+              </span>
+              <span className="text-[10px] uppercase font-semibold text-amber-600 dark:text-amber-400 tracking-widest mt-1">
+                International Academy
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-7">
+            {mainNavLinks.map((link) => (
+              <Link
+                key={link.path}
+                href={link.path}
+                className={`relative py-1.5 text-sm font-semibold tracking-wide transition-colors hover:text-amber-605 dark:hover:text-amber-400 ${
+                  pathname === link.path
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-slate-700 dark:text-slate-200"
+                }`}
+              >
+                {link.label}
+                {pathname === link.path && (
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-500 rounded-full" />
+                )}
+              </Link>
+            ))}
+          </div>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <Link href="/admissions">
+              <Button variant="secondary" size="sm">
+                Apply Online
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-350 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-905 transition-colors focus:outline-none"
+            aria-label="Toggle navigation menu"
+            id="mobile-nav-toggle"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </nav>
+      </header>
+
+      {/* Spacer to push content below the fixed header */}
+      <div className={`w-full transition-all duration-300 ${isScrolled ? "h-[72px]" : "h-[72px] lg:h-[110px]"}`} />
+
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Drawer Menu */}
+      <div
+        className={`fixed top-0 right-0 h-full w-[300px] bg-white dark:bg-slate-950 shadow-2xl z-50 lg:hidden transform transition-transform duration-300 ease-in-out border-l border-slate-100 dark:border-slate-800 ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">
+                PINECREST
+              </span>
+            </div>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-55 dark:hover:bg-slate-900"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Links List */}
+          <div className="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
+            {allLinks.map((link) => {
+              const isActive = pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    isActive
+                      ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50"
+                  }`}
+                >
+                  <span className="text-sm font-semibold tracking-wide">
+                    {link.label}
+                  </span>
+                  <ChevronRight
+                    className={`w-4 h-4 transition-transform ${
+                      isActive
+                        ? "text-amber-500"
+                        : "text-slate-350 dark:text-slate-600 group-hover:translate-x-1"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Mobile Footer Callout */}
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-6 mt-6">
+            <Link href="/admissions" className="block w-full mb-3">
+              <Button variant="secondary" className="w-full text-center py-3">
+                Apply Online
+              </Button>
+            </Link>
+            <p className="text-xs text-center text-slate-400 dark:text-slate-500">
+              © {new Date().getFullYear()} Pinecrest Academy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
