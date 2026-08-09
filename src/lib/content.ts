@@ -200,8 +200,9 @@ async function fetchTable<T>(
 
 /**
  * Wraps a public fetcher in the Next.js data cache so CMS edits can be pushed
- * to visitors via `revalidateTag`. The fallback (static seed) is cached too —
- * that only happens when Supabase is unconfigured or a query fails.
+ * to visitors via `updateTag` (see @/lib/admin/revalidate). The fallback
+ * (static seed) is cached too — that only happens when Supabase is
+ * unconfigured or a query fails.
  */
 function cacheable<T extends (...args: any[]) => Promise<any>>(
   fn: T,

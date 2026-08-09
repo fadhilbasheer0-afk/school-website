@@ -29,18 +29,31 @@ export const CACHE_TAGS = {
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
 
-/** Maps a CMS table to the public cache tags + public routes it affects. */
+/**
+ * Maps a CMS table to the public cache tags + public routes it affects.
+ *
+ *   tags         — unstable_cache tags invalidated with updateTag() after a write
+ *   paths        — literal public routes that must re-render
+ *   pagePatterns — SSG detail routes (dynamic segments) that must re-render
+ *   purgeClient  — site-wide change: purge the client router cache too
+ */
 export const TABLE_CONTENT_MAP: Record<
   string,
-  { tags: CacheTag[]; paths: string[] }
+  {
+    tags: CacheTag[];
+    paths: string[];
+    pagePatterns?: string[];
+    purgeClient?: boolean;
+  }
 > = {
   // Home
-  home_content: { tags: [CACHE_TAGS.home], paths: ["/"] },
-  home_hero_slides: { tags: [CACHE_TAGS.home], paths: ["/"] },
-  home_statistics: { tags: [CACHE_TAGS.home], paths: ["/"] },
+  home_content: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
+  home_hero_slides: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
+  home_statistics: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
   achievements: {
     tags: [CACHE_TAGS.achievements, CACHE_TAGS.home],
     paths: ["/", "/activities"],
+    purgeClient: true,
   },
   // About
   about_content: { tags: [CACHE_TAGS.about], paths: ["/about"] },
@@ -57,13 +70,30 @@ export const TABLE_CONTENT_MAP: Record<
   school_settings: {
     tags: [CACHE_TAGS.settings, CACHE_TAGS.home, CACHE_TAGS.contact],
     paths: ["/", "/contact"],
+    purgeClient: true,
   },
   // Directory / content lists
   facilities: { tags: [CACHE_TAGS.facilities], paths: ["/facilities"] },
   teachers: { tags: [CACHE_TAGS.faculty], paths: ["/faculty"] },
-  gallery_albums: { tags: [CACHE_TAGS.gallery], paths: ["/gallery"] },
-  gallery_photos: { tags: [CACHE_TAGS.gallery], paths: ["/gallery"] },
-  announcements: { tags: [CACHE_TAGS.news], paths: ["/news"] },
-  events: { tags: [CACHE_TAGS.events], paths: ["/events"] },
+  gallery_albums: {
+    tags: [CACHE_TAGS.gallery],
+    paths: ["/gallery"],
+    pagePatterns: ["/gallery/[slug]"],
+  },
+  gallery_photos: {
+    tags: [CACHE_TAGS.gallery],
+    paths: ["/gallery"],
+    pagePatterns: ["/gallery/[slug]"],
+  },
+  announcements: {
+    tags: [CACHE_TAGS.news],
+    paths: ["/news"],
+    pagePatterns: ["/news/[slug]"],
+  },
+  events: {
+    tags: [CACHE_TAGS.events],
+    paths: ["/events"],
+    pagePatterns: ["/events/[slug]"],
+  },
   activities: { tags: [CACHE_TAGS.activities], paths: ["/activities"] },
 };

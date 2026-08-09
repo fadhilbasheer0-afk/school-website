@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient, isSupabaseConfigured } from "./server";
 
 export type AdminRole = "owner" | "admin" | "editor" | "viewer";
@@ -24,8 +25,11 @@ interface ProfileRow {
  * Resolves the authenticated user together with their profile row. Returns
  * null when there is no session, the profile is missing, or the profile is
  * deactivated. Never throws for missing configuration — returns null instead.
+ *
+ * Wrapped in React `cache()` so the (protected) layout and every admin page
+ * share a single Supabase round-trip per request instead of one each.
  */
-export async function getAdminSession(): Promise<AdminSession | null> {
+export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
   if (!isSupabaseConfigured) {
     return null;
   }
@@ -61,7 +65,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     role: profile.role,
     schoolId: profile.school_id,
   };
-}
+});
 
 /**
  * Guard for protected admin routes. Redirects unauthenticated users to the
