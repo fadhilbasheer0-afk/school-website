@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   SCHOOL_ASSETS_BUCKET,
   buildStoragePath,
@@ -26,6 +27,26 @@ function requireSupabaseUrl(): string {
 }
 
 /**
+ * Resolves the authenticated user's school id so uploads land in the
+ * `{schoolId}/{folder}/...` layout required by the storage RLS policy.
+ * Returns null when the profile is missing (RLS would reject the upload).
+ */
+async function getCurrentSchoolId(supabase: SupabaseClient): Promise<string | null> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from("profiles")
+    .select("school_id")
+    .eq("id", user.id)
+    .maybeSingle();
+  return typeof data?.school_id === "string" && data.school_id
+    ? data.school_id
+    : null;
+}
+
+/**
  * Uploads a single file to `school-assets/{folder}` with a live progress
  * callback. Uses a raw XMLHttpRequest against the Storage REST API so the
  * caller gets real progress events; falls back to the supabase-js upload
@@ -41,7 +62,11 @@ export async function uploadFileToStorage(
   if (!validation.ok) throw new Error(validation.error);
 
   const supabase = createClient();
-  const path = buildStoragePath(folder, file);
+  const schoolId = await getCurrentSchoolId(supabase);
+  if (!schoolId) {
+    throw new Error("Unable to resolve your school. Make sure you are signed in as an admin.");
+  }
+  const path = buildStoragePath(schoolId, folder, file);
   onProgress?.(0);
 
   const {

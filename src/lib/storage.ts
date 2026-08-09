@@ -80,10 +80,16 @@ export function sanitizeFileName(name: string): string {
   return (cleanExt ? `${stem}.${cleanExt}` : stem).slice(0, 80) || "file";
 }
 
-/** Builds the object path for a new upload: {folder}/{timestamp}-{safeName}. */
-export function buildStoragePath(folder: string, file: File): string {
+/**
+ * Builds the object path for a new upload.
+ * Objects live under `{schoolId}/{folder}/{file}` so the storage RLS policy
+ * can enforce that admins only write into their own school's folder.
+ */
+export function buildStoragePath(schoolId: string, folder: string, file: File): string {
   const safeName = sanitizeFileName(file.name);
-  return `${folder.replace(/^\/+|\/+$/g, "")}/${Date.now()}-${safeName}`;
+  const cleanSchool = schoolId.replace(/^\/+|\/+$/g, "");
+  const cleanFolder = folder.replace(/^\/+|\/+$/g, "");
+  return `${cleanSchool}/${cleanFolder}/${Date.now()}-${safeName}`;
 }
 
 /** True when a MIME type is allowed for the given upload kind. */
