@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 const isSupabaseConfigured = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim() &&
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim()
 );
 
 const AUTH_PAGES = ["/admin/login", "/admin/forgot-password"];
@@ -27,10 +27,12 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
+  const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
+
+  let supabase;
+  try {
+    supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -44,12 +46,21 @@ export async function proxy(request: NextRequest) {
           );
         },
       },
-    }
-  );
+    });
+  } catch {
+    // Malformed env (e.g. accidentally quoted values) → bypass auth guard.
+    return response;
+  }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Supabase unreachable → let the page render; admin routes still enforce
+    // authorization server-side.
+    return response;
+  }
 
   const isAdminPath = pathname.startsWith("/admin");
   const isAuthPage = AUTH_PAGES.includes(pathname);
