@@ -73,18 +73,23 @@ export function SettingsAdmin({ settings }: { settings: Record<string, any> | nu
     e.preventDefault();
     setSaving(true);
     setError("");
-    const result: ActionResult = await saveSettings({
-      ...form,
-      office_hours: form.office_hours.filter((h) => h.label || h.value),
-      social_links: Object.fromEntries(
-        Object.entries(form.social_links).filter(([, v]) => Boolean(v))
-      ),
-    });
-    if (result.ok) {
-      show("Settings saved.");
-      router.refresh();
-    } else {
-      setError(result.error || "Failed to save settings.");
+    try {
+      const result: ActionResult = await saveSettings({
+        ...form,
+        office_hours: form.office_hours.filter((h) => h.label || h.value),
+        social_links: Object.fromEntries(
+          Object.entries(form.social_links).filter(([, v]) => Boolean(v))
+        ),
+      });
+      if (result.ok) {
+        show("Settings saved.");
+        router.refresh();
+      } else {
+        setError(result.error || "Failed to save settings.");
+      }
+    } catch {
+      setError("Failed to save settings.");
+    } finally {
       setSaving(false);
     }
   };

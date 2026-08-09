@@ -220,12 +220,17 @@ function BrandingForm({ settings }: { settings: Record<string, any> }) {
     e.preventDefault();
     setSaving(true);
     setError("");
-    const result: ActionResult = await saveHomeSettings(form);
-    if (result.ok) {
-      show("Branding saved.");
-      router.refresh();
-    } else {
-      setError(result.error || "Failed to save branding.");
+    try {
+      const result: ActionResult = await saveHomeSettings(form);
+      if (result.ok) {
+        show("Branding saved.");
+        router.refresh();
+      } else {
+        setError(result.error || "Failed to save branding.");
+      }
+    } catch {
+      setError("Failed to save branding.");
+    } finally {
       setSaving(false);
     }
   };

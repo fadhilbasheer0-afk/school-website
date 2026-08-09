@@ -474,6 +474,22 @@ export function RecordList({
                   {item.featured && (
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
                   )}
+                  {onToggle && (
+                    <span
+                      className={`shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        item.published
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+                      }`}
+                      title={
+                        item.published
+                          ? "Visible on the public site"
+                          : "Hidden from the public site until published"
+                      }
+                    >
+                      {item.published ? "Live" : "Draft"}
+                    </span>
+                  )}
                 </div>
                 {item.subtitle && (
                   <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">
@@ -641,13 +657,18 @@ export function RecordManager({
     e.preventDefault();
     setSubmitting(true);
     setError("");
-    const result = await onSave({ ...form, id: editingId ?? undefined });
-    if (result.ok) {
-      show("Saved successfully.");
-      setEditorOpen(false);
-      router.refresh();
-    } else {
-      setError(result.error || "Failed to save. Please check the form.");
+    try {
+      const result = await onSave({ ...form, id: editingId ?? undefined });
+      if (result.ok) {
+        show("Saved successfully.");
+        setEditorOpen(false);
+        router.refresh();
+      } else {
+        setError(result.error || "Failed to save. Please check the form.");
+      }
+    } catch {
+      setError("Failed to save. Please try again.");
+    } finally {
       setSubmitting(false);
     }
   };
