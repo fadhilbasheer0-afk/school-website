@@ -41,7 +41,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       </Tag>
       <div className={`h-1.5 w-20 bg-gradient-to-r from-amber-500 to-indigo-600 rounded-full mt-4 mb-5 ${lineAlignmentClass[align]}`} />
       {subtitle && (
-        <p className="text-base md:text-lg text-slate-500 dark:text-slate-405 max-w-2xl leading-relaxed">
+        <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
           {subtitle}
         </p>
       )}

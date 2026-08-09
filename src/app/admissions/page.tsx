@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { AdmissionsInquiryForm } from "@/components/admissions/AdmissionsInquiryForm";
 import { siteConfig } from "@/lib/site";
+import { getAdmissions } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Admissions & Enrollment",
@@ -164,7 +165,7 @@ const admissionSteps = [
   },
   {
     step: "03",
-    icon: <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-450" />,
+    icon: <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />,
     title: "Assessment Interview",
     desc: "Schedule a campus visit for basic cognitive assessment tests and a discussion with our principal.",
   },
@@ -176,7 +177,11 @@ const admissionSteps = [
   },
 ];
 
-export default function Admissions() {
+export default async function Admissions() {
+  const sections = await getAdmissions();
+  const byKey: Record<string, string | undefined> = {};
+  for (const s of sections) byKey[s.sectionKey] = s.body;
+
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -204,15 +209,22 @@ export default function Admissions() {
               Welcome to the Pinecrest Community
             </h2>
             <div className="h-1.5 w-20 bg-gradient-to-r from-amber-500 to-indigo-600 rounded-full mt-4 mb-6" />
-            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-              Since 1995, Pinecrest Academy has welcomed students from more than 35 nationalities into a vibrant,
-              globally-minded learning community. Our admissions process is designed to be transparent and supportive,
-              helping families find the right placement for their child.
-            </p>
-            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
-              We review each application holistically — academic records, personal character, and potential — rather
-              than through test scores alone. Scholarships and financial aid are available for qualifying families.
-            </p>
+            {(byKey.introduction
+              ? byKey.introduction.split("\n").filter(Boolean)
+              : [
+                  "Since 1995, Pinecrest Academy has welcomed students from more than 35 nationalities into a vibrant, globally-minded learning community. Our admissions process is designed to be transparent and supportive, helping families find the right placement for their child.",
+                  "We review each application holistically — academic records, personal character, and potential — rather than through test scores alone. Scholarships and financial aid are available for qualifying families.",
+                ]
+            ).map((paragraph, i) => (
+              <p
+                key={i}
+                className={`text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed${
+                  i === 0 ? " mb-4" : " mb-8"
+                }`}
+              >
+                {paragraph}
+              </p>
+            ))}
             <div className="flex flex-wrap gap-4">
               <Link href="#inquiry-form">
                 <Button variant="secondary" leftIcon={<ArrowRight className="w-4 h-4" />}>
@@ -234,7 +246,7 @@ export default function Admissions() {
             as="h2"
             badge="Who Can Apply"
             title="Eligibility Requirements"
-            subtitle="Families considering enrollment should review the following criteria before beginning an application."
+            subtitle={byKey.eligibility || "Families considering enrollment should review the following criteria before beginning an application."}
             align="center"
             className="mx-auto"
           />
@@ -259,7 +271,7 @@ export default function Admissions() {
             as="h2"
             badge="Class Levels"
             title="Classes Available"
-            subtitle="Admissions are open across all grade levels for the upcoming academic year."
+            subtitle={byKey.classes || "Admissions are open across all grade levels for the upcoming academic year."}
             align="center"
             className="mx-auto"
           />
@@ -296,7 +308,7 @@ export default function Admissions() {
                 as="h2"
                 badge="Checklist"
                 title="Required Documents"
-                subtitle="Please prepare the following documents. Incomplete applications may not be considered."
+                subtitle={byKey.documents || "Please prepare the following documents. Incomplete applications may not be considered."}
                 align="left"
               />
               <ul className="flex flex-col gap-3.5">
@@ -329,7 +341,7 @@ export default function Admissions() {
             as="h2"
             badge="Application Flow"
             title="Admission Procedure"
-            subtitle="Four clear steps take you from inquiry to enrollment."
+            subtitle={byKey.procedure || "Four clear steps take you from inquiry to enrollment."}
             align="center"
             className="mx-auto"
           />
@@ -341,7 +353,7 @@ export default function Admissions() {
                     <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center">
                       {st.icon}
                     </div>
-                    <span className="text-lg font-black text-slate-350 dark:text-slate-700 tracking-tight">#{st.step}</span>
+                    <span className="text-lg font-black text-slate-300 dark:text-slate-700 tracking-tight">#{st.step}</span>
                   </div>
                   <CardTitle className="text-base mt-4">{st.title}</CardTitle>
                 </CardHeader>
@@ -359,7 +371,7 @@ export default function Admissions() {
             as="h2"
             badge="Key Deadlines"
             title="Important Dates"
-            subtitle="Mark your calendar — these deadlines apply to the upcoming academic year."
+            subtitle={byKey["important-dates"] || "Mark your calendar — these deadlines apply to the upcoming academic year."}
             align="center"
             className="mx-auto"
           />
@@ -448,7 +460,7 @@ export default function Admissions() {
                 as="h2"
                 badge="Tuition"
                 title="Fees & Tuition"
-                subtitle="A transparent fee schedule for the upcoming academic year."
+                subtitle={byKey.fees || "A transparent fee schedule for the upcoming academic year."}
                 align="left"
               />
               <div className="rounded-2xl border border-amber-200/60 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/10 p-5">
@@ -491,7 +503,7 @@ export default function Admissions() {
             as="h2"
             badge="Downloads"
             title="Downloadable Forms & Documents"
-            subtitle="Download and print the required admission forms. Digital uploads are also accepted through the application portal."
+            subtitle={byKey.forms || "Download and print the required admission forms. Digital uploads are also accepted through the application portal."}
             align="center"
             className="mx-auto"
           />
@@ -541,7 +553,7 @@ export default function Admissions() {
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm text-slate-850 dark:text-white">Email</h3>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white">Email</h3>
                       <a href={`mailto:${siteConfig.admissionsEmail}`} className="text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">
                         {siteConfig.admissionsEmail}
                       </a>
@@ -552,8 +564,8 @@ export default function Admissions() {
                       <Phone className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm text-slate-850 dark:text-white">Phone</h3>
-                      <a href="tel:+18005550199" className="text-xs text-slate-500 dark:text-slate-400 hover:text-amber-600 font-medium">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white">Phone</h3>
+                      <a href={`tel:${siteConfig.phoneAdmissions.replace(/[^+\d]/g, "")}`} className="text-xs text-slate-500 dark:text-slate-400 hover:text-amber-600 font-medium">
                         {siteConfig.phoneAdmissions}
                       </a>
                     </div>
@@ -563,7 +575,7 @@ export default function Admissions() {
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm text-slate-850 dark:text-white">Office Hours</h3>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white">Office Hours</h3>
                       {siteConfig.officeHours.map((hours) => (
                         <p key={hours.label} className="text-xs text-slate-500 dark:text-slate-400 font-light">
                           {hours.label}: <span className="font-medium">{hours.value}</span>

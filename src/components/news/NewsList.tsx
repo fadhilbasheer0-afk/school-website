@@ -122,6 +122,7 @@ export const NewsList: React.FC<{ news: NewsArticle[] }> = ({ news }) => {
                 <div className="lg:col-span-5">
                   <ImagePlaceholder
                     label={featured.image}
+                    src={featured.image}
                     aspectRatio="aspect-video lg:aspect-auto lg:h-full"
                     className="rounded-b-none lg:rounded-r-none border-0"
                   />
@@ -182,6 +183,7 @@ const NewsCard: React.FC<{ article: NewsArticle }> = ({ article }) => {
     <Card className="flex flex-col h-full">
       <ImagePlaceholder
         label={article.image}
+        src={article.image}
         aspectRatio="aspect-video"
         className="rounded-b-none"
       />

@@ -50,8 +50,8 @@ export const ContactForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900/60 p-8 md:p-10 border border-slate-202/50 dark:border-slate-800/80 rounded-3xl shadow-sm">
-      <h2 className="text-2xl font-extrabold text-slate-850 dark:text-white mb-2">
+    <div className="bg-white dark:bg-slate-900/60 p-8 md:p-10 border border-slate-200/50 dark:border-slate-800/80 rounded-3xl shadow-sm">
+      <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
         Send Us a Message
       </h2>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-light">
@@ -59,13 +59,13 @@ export const ContactForm: React.FC = () => {
       </p>
 
       {success ? (
-        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/40 rounded-2xl p-6 text-center text-emerald-800 dark:text-emerald-300">
+        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-2xl p-6 text-center text-emerald-800 dark:text-emerald-300">
           <ShieldCheck className="w-12 h-12 text-emerald-500 mx-auto mb-3 animate-bounce" />
           <h3 className="font-bold text-lg">Message Delivered Successfully!</h3>
-          <p className="text-xs text-emerald-600 dark:text-emerald-450 mt-1 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 max-w-sm mx-auto leading-relaxed">
             Thank you for reaching out. We have received your submission code and will follow up shortly.
           </p>
-          <Button variant="outline" className="mt-6 border-emerald-350 text-emerald-850 dark:text-emerald-400 hover:bg-emerald-100" onClick={() => setSuccess(false)}>
+          <Button variant="outline" className="mt-6 border-emerald-300 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-100" onClick={() => setSuccess(false)}>
             Send another message
           </Button>
         </div>

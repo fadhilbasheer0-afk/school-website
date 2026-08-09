@@ -39,7 +39,12 @@ export default async function NewsArticlePage({ params }: PageProps) {
   const all = await getAnnouncements();
   const related = all
     .filter((a) => a.slug !== article.slug)
-    .sort((a, b) => (a.category === article.category ? -1 : 1) || b.date.localeCompare(a.date))
+    .sort((a, b) => {
+      const aMatch = a.category === article.category;
+      const bMatch = b.category === article.category;
+      if (aMatch !== bMatch) return aMatch ? -1 : 1;
+      return b.date.localeCompare(a.date);
+    })
     .slice(0, 3);
 
   return (

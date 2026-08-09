@@ -19,7 +19,7 @@ export default function NotFound() {
         <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
           Lost on Campus?
         </h1>
-        <p className="text-slate-510 dark:text-slate-400 leading-relaxed mb-10 max-w-sm">
+        <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-sm">
           It looks like the page you are looking for has either been moved, renamed, or doesn&rsquo;t exist in our campus directory.
         </p>
 
@@ -37,7 +37,7 @@ export default function NotFound() {
           <Link href="/contact" className="flex-1 w-full">
             <Button
               variant="outline"
-              className="w-full justify-center border-slate-350 text-slate-800 dark:border-slate-805 dark:text-white"
+              className="w-full justify-center border-slate-300 text-slate-800 dark:border-slate-800 dark:text-white"
               leftIcon={<HelpCircle className="w-4 h-4" />}
             >
               Help Desk

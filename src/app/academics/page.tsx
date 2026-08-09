@@ -28,10 +28,11 @@ import {
 } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
+import { getAcademicData } from "@/lib/content";
 
 /* ─── data ──────────────────────────────────────────────── */
 
-const grades = [
+const staticGrades = [
   {
     division: "Primary Years",
     grades: "Grades 1 – 5",
@@ -91,7 +92,7 @@ const grades = [
   },
 ];
 
-const departments = [
+const staticDepartments = [
   {
     icon: <Calculator className="w-6 h-6" />,
     name: "Mathematics",
@@ -136,7 +137,7 @@ const departments = [
   },
 ];
 
-const calendarTerms = [
+const staticCalendarTerms = [
   {
     term: "Term 1 — Autumn",
     dates: "August 18 – December 12, 2026",
@@ -172,13 +173,14 @@ const calendarTerms = [
   },
 ];
 
-const downloadableDocuments = [
+const staticDocuments = [
   {
     title: "School Prospectus 2026–27",
     description:
       "A comprehensive overview of Pinecrest Academy's programmes, facilities, admissions, and fees.",
     fileType: "PDF",
     fileSize: "4.2 MB",
+    url: "",
   },
   {
     title: "IB Diploma Programme Guide",
@@ -186,6 +188,7 @@ const downloadableDocuments = [
       "Detailed information on IB subject groups, core requirements, and university recognition.",
     fileType: "PDF",
     fileSize: "2.8 MB",
+    url: "",
   },
   {
     title: "Cambridge IGCSE Subject Options",
@@ -193,6 +196,7 @@ const downloadableDocuments = [
       "A list of available IGCSE subjects for Grades 9–10, including prerequisites and assessment formats.",
     fileType: "PDF",
     fileSize: "1.5 MB",
+    url: "",
   },
   {
     title: "Academic Calendar 2026–27",
@@ -200,6 +204,7 @@ const downloadableDocuments = [
       "Full-year calendar with term dates, examination periods, holidays, and key school events.",
     fileType: "PDF",
     fileSize: "0.8 MB",
+    url: "",
   },
   {
     title: "Student Handbook & Code of Conduct",
@@ -207,6 +212,7 @@ const downloadableDocuments = [
       "Policies on attendance, behaviour expectations, dress code, technology use, and academic integrity.",
     fileType: "PDF",
     fileSize: "1.1 MB",
+    url: "",
   },
   {
     title: "Parent Partnership Guide",
@@ -214,6 +220,7 @@ const downloadableDocuments = [
       "How parents can support learning at home, communicate with teachers, and engage with school events.",
     fileType: "PDF",
     fileSize: "0.9 MB",
+    url: "",
   },
 ];
 
@@ -240,7 +247,78 @@ const specialisedElectives = [
 
 /* ─── page ──────────────────────────────────────────────── */
 
-export default function Academics() {
+function departmentIcon(name: string) {
+  const n = name.toLowerCase();
+  if (/(math)/.test(n)) return <Calculator className="w-6 h-6" />;
+  if (/(scien)/.test(n)) return <Microscope className="w-6 h-6" />;
+  if (/(human|language|english|history|geograph)/.test(n))
+    return <BookOpen className="w-6 h-6" />;
+  if (/(computer|techn|ict|digital)/.test(n))
+    return <Code className="w-6 h-6" />;
+  if (/(art|music|drama|perform)/.test(n))
+    return <Palette className="w-6 h-6" />;
+  if (/(physical|athletic|sport)/.test(n)) return <Trophy className="w-6 h-6" />;
+  return <GraduationCap className="w-6 h-6" />;
+}
+
+export default async function Academics() {
+  const academic = await getAcademicData();
+
+  const gradeColors = [
+    "border-t-emerald-500",
+    "border-t-amber-500",
+    "border-t-indigo-500",
+  ];
+  const gradeTagColors = [
+    "text-emerald-600 dark:text-emerald-400",
+    "text-amber-600 dark:text-amber-400",
+    "text-indigo-600 dark:text-indigo-400",
+  ];
+
+  const grades =
+    academic.classes.length > 0
+      ? academic.classes.map((c, i) => ({
+          division: c.level,
+          grades: c.gradeLabel,
+          ageRange: c.ageRange,
+          focus: c.level,
+          description: c.description,
+          subjects: [] as string[],
+          color: gradeColors[i % gradeColors.length],
+          tagColor: gradeTagColors[i % gradeTagColors.length],
+        }))
+      : staticGrades;
+
+  const departments =
+    academic.departments.length > 0
+      ? academic.departments.map((d) => ({
+          icon: departmentIcon(d.name),
+          name: d.name,
+          description: d.description,
+          head: "",
+        }))
+      : staticDepartments;
+
+  const calendarTerms =
+    academic.calendar.length > 0
+      ? academic.calendar.map((c) => ({
+          term: c.title,
+          dates: c.dates,
+          events: [] as string[],
+        }))
+      : staticCalendarTerms;
+
+  const downloadableDocuments =
+    academic.documents.length > 0
+      ? academic.documents.map((d) => ({
+          title: d.title,
+          description: d.description,
+          fileType: d.category || "PDF",
+          fileSize: "",
+          url: d.fileUrl,
+        }))
+      : staticDocuments;
+
   return (
     <div className="w-full flex flex-col font-sans">
       {/* ════════ 1 · ACADEMIC INTRODUCTION ════════ */}
@@ -334,19 +412,21 @@ export default function Academics() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                     {g.description}
                   </p>
-                  <div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                      Core Subjects:
-                    </span>
-                    <ul className="flex flex-col gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-2">
-                      {g.subjects.map((s, j) => (
-                        <li key={j} className="flex items-start gap-2 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {g.subjects.length > 0 && (
+                    <div>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                        Core Subjects:
+                      </span>
+                      <ul className="flex flex-col gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-2">
+                        {g.subjects.map((s, j) => (
+                          <li key={j} className="flex items-start gap-2 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Link href="/contact" className="w-full">
@@ -442,9 +522,11 @@ export default function Academics() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                     {d.description}
                   </p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-auto pt-2 border-t border-slate-100 dark:border-slate-800">
-                    {d.head}
-                  </p>
+                  {d.head ? (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-auto pt-2 border-t border-slate-100 dark:border-slate-800">
+                      {d.head}
+                    </p>
+                  ) : null}
                 </CardContent>
               </Card>
             ))}
@@ -517,14 +599,20 @@ export default function Academics() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <ul className="flex flex-col gap-2.5 text-sm text-slate-500 dark:text-slate-400">
-                    {t.events.map((ev, j) => (
-                      <li key={j} className="flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
-                        <span className="leading-relaxed">{ev}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {t.events.length > 0 ? (
+                    <ul className="flex flex-col gap-2.5 text-sm text-slate-500 dark:text-slate-400">
+                      {t.events.map((ev, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
+                          <span className="leading-relaxed">{ev}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Dates: {t.dates}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -610,8 +698,12 @@ export default function Academics() {
                   </div>
                   <div className="flex gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     <span>{doc.fileType}</span>
-                    <span>•</span>
-                    <span>{doc.fileSize}</span>
+                    {doc.fileSize ? (
+                      <>
+                        <span>•</span>
+                        <span>{doc.fileSize}</span>
+                      </>
+                    ) : null}
                   </div>
                 </div>
                 <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">
@@ -620,13 +712,25 @@ export default function Academics() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed flex-grow">
                   {doc.description}
                 </p>
-                <button
-                  type="button"
-                  className="mt-auto inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Download {doc.fileType}
-                </button>
+                {doc.url ? (
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Download {doc.fileType}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-auto inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Download {doc.fileType}
+                  </button>
+                )}
               </div>
             ))}
           </div>

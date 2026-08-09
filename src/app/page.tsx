@@ -26,10 +26,19 @@ import {
 } from "@/components/ui/Card";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
+import {
+  getHomeStats,
+  getHeroSlides,
+  getAnnouncements,
+  getEvents,
+  getAchievements,
+  getFacilities,
+  getGalleryImages,
+} from "@/lib/content";
 
-/* ─── static data ───────────────────────────────────────── */
+/* ─── static fallbacks ──────────────────────────────────── */
 
-const stats = [
+const staticStats = [
   { number: "25+", label: "Years of Excellence" },
   { number: "1,200+", label: "Students Enrolled" },
   { number: "100%", label: "University Placement" },
@@ -38,7 +47,7 @@ const stats = [
   { number: "40+", label: "Clubs & Activities" },
 ];
 
-const announcements = [
+const staticAnnouncements = [
   {
     tag: "Academic",
     tagColor: "text-indigo-600 dark:text-indigo-400",
@@ -46,6 +55,7 @@ const announcements = [
     excerpt:
       "Fifteen of our graduating seniors have been named semi-finalists in the 2026 National Merit Scholarship program, placing them in the top 1% nationwide.",
     date: "Aug 05, 2026",
+    image: null as string | null,
   },
   {
     tag: "Science & Technology",
@@ -54,6 +64,7 @@ const announcements = [
     excerpt:
       "Individual and team projects in environmental engineering, robotics, and software development are welcome. Grand prizes include college-level lab sponsorships.",
     date: "Aug 02, 2026",
+    image: null as string | null,
   },
   {
     tag: "Community",
@@ -62,10 +73,11 @@ const announcements = [
     excerpt:
       "Our student-led environmental club begins a semester-long survey of native flora and fauna to inform sustainable landscaping policies.",
     date: "Jul 28, 2026",
+    image: null as string | null,
   },
 ];
 
-const upcomingEvents = [
+const staticEvents = [
   {
     day: "12",
     month: "Aug",
@@ -89,7 +101,7 @@ const upcomingEvents = [
   },
 ];
 
-const achievements = [
+const staticAchievements = [
   {
     icon: <Trophy className="w-6 h-6 text-amber-500" />,
     title: "National Science Olympiad — Gold Medal",
@@ -110,32 +122,195 @@ const achievements = [
   },
 ];
 
-const facilities = [
+const staticFacilities = [
   {
     title: "STEM & Robotics Lab",
     description:
       "3D printers, Arduino stations, and automated workspace benches for hands-on engineering projects.",
+    image: null as string | null,
   },
   {
     title: "Digital Library & Media Center",
     description:
       "Over 32,000 volumes plus high-speed computer terminals, private study cabins, and media collaboration spaces.",
+    image: null as string | null,
   },
   {
     title: "Olympic Aquatic Center",
     description:
       "A heated, 10-lane semi-olympic swimming pool with diving boards, coaching offices, and safety surveillance.",
+    image: null as string | null,
   },
   {
     title: "Performing Arts Auditorium",
     description:
       "A 600-seat theater with professional lighting rigs, digital sound mixing, and backstage dressing suites.",
+    image: null as string | null,
   },
 ];
 
+const staticHero = {
+  title: "Nurturing Minds, Inspiring Futures",
+  subtitle:
+    "Welcome to Pinecrest Academy — where academic rigour, character development, and global citizenship come together. We empower every student to excel, lead, and make a difference.",
+  imageUrl: null as string | null,
+  ctaLabel: "Apply Now",
+  ctaUrl: "/admissions",
+};
+
+/* ─── helpers ────────────────────────────────────────────── */
+
+function formatNewsDate(value: string): string {
+  if (!value) return "";
+  const d = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+}
+
+const announcementTagColors: Record<string, string> = {
+  Academic: "text-indigo-600 dark:text-indigo-400",
+  "Science & STEM": "text-emerald-600 dark:text-emerald-400",
+  "Science & Technology": "text-emerald-600 dark:text-emerald-400",
+  Sports: "text-amber-600 dark:text-amber-400",
+  "Arts & Drama": "text-rose-600 dark:text-rose-400",
+  Community: "text-amber-600 dark:text-amber-400",
+};
+
+function toAnnouncement(item: {
+  title: string;
+  category: string;
+  date: string;
+  summary: string;
+  image?: string | null;
+}): {
+  tag: string;
+  tagColor: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  image: string | null;
+} {
+  return {
+    tag: item.category,
+    tagColor: announcementTagColors[item.category] ?? "text-indigo-600 dark:text-indigo-400",
+    title: item.title,
+    excerpt: item.summary,
+    date: formatNewsDate(item.date),
+    image: item.image || null,
+  };
+}
+
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function toEventCard(item: {
+  title: string;
+  startDate: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+}): {
+  day: string;
+  month: string;
+  title: string;
+  time: string;
+  location: string;
+} {
+  const d = new Date(`${item.startDate}T00:00:00`);
+  const day = Number.isNaN(d.getTime()) ? String(item.startDate).slice(8, 10) : String(d.getDate());
+  const month = Number.isNaN(d.getTime())
+    ? String(item.startDate).slice(5, 7)
+    : monthNames[d.getMonth()];
+  const time =
+    item.startTime === item.endTime
+      ? item.startTime
+      : `${item.startTime} – ${item.endTime}`;
+  return { day, month, title: item.title, time, location: item.venue };
+}
+
+function achievementIcon(category: string) {
+  const c = category.toLowerCase();
+  if (/(sport|swim|athletic|championship|medal|game|track|soccer)/.test(c))
+    return <Trophy className="w-6 h-6 text-amber-500" />;
+  if (/(academic|olympiad|diploma|ib|exam|scholar|merit)/.test(c))
+    return <Award className="w-6 h-6 text-indigo-500" />;
+  return <Star className="w-6 h-6 text-emerald-500" />;
+}
+
 /* ─── page component ────────────────────────────────────── */
 
-export default function Home() {
+export default async function Home() {
+  const [
+    stats,
+    heroSlides,
+    announcements,
+    events,
+    achievements,
+    facilities,
+    galleryImages,
+  ] = await Promise.all([
+    getHomeStats(),
+    getHeroSlides(),
+    getAnnouncements(),
+    getEvents(),
+    getAchievements(),
+    getFacilities(),
+    getGalleryImages(),
+  ]);
+
+  const hero = heroSlides?.[0] ?? staticHero;
+  const heroSubtitle =
+    hero.subtitle || staticHero.subtitle;
+  const heroImage = hero.imageUrl ?? staticHero.imageUrl;
+  const heroCtaLabel = hero.ctaLabel || staticHero.ctaLabel;
+  const heroCtaUrl = hero.ctaUrl || staticHero.ctaUrl;
+
+  const statItems =
+    stats && stats.length > 0
+      ? stats.map((s) => ({ number: s.value, label: s.label }))
+      : staticStats;
+
+  const announcementItems =
+    announcements && announcements.length > 0
+      ? announcements.slice(0, 3).map(toAnnouncement)
+      : staticAnnouncements;
+
+  const eventItems =
+    events && events.length > 0
+      ? events.slice(0, 3).map(toEventCard)
+      : staticEvents;
+
+  const achievementItems =
+    achievements && achievements.length > 0
+      ? achievements.slice(0, 3).map((a) => ({
+          icon: achievementIcon(a.category),
+          title: a.title,
+          description: a.description,
+        }))
+      : staticAchievements;
+
+  const facilityItems =
+    facilities && facilities.length > 0
+      ? facilities.slice(0, 4).map((f) => ({
+          title: f.title,
+          description: f.description,
+          image: f.mainImage,
+        }))
+      : staticFacilities;
+
+  const galleryCaptions =
+    galleryImages && galleryImages.length > 0
+      ? galleryImages.slice(0, 8).map((g) => g.alt || g.caption || "Campus photograph")
+      : [
+          "Students in Science Lab",
+          "Football Match on Main Pitch",
+          "Autumn Drama Rehearsal",
+          "Library Study Session",
+          "Robotics Club Workshop",
+          "School Assembly Morning",
+          "Art Exhibition Display",
+          "Graduation Ceremony",
+        ];
+
   return (
     <div className="w-full flex flex-col font-sans">
       {/* ════════ 1 · HERO ════════ */}
@@ -169,28 +344,22 @@ export default function Home() {
             </span>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
-              Nurturing Minds,{" "}
-              <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-400">
-                Inspiring Futures
-              </span>
+              {hero.title || "Nurturing Minds, Inspiring Futures"}
             </h1>
 
             <p className="text-slate-400 mt-6 text-base md:text-lg leading-relaxed max-w-xl">
-              Welcome to Pinecrest Academy — where academic rigour, character
-              development, and global citizenship come together. We empower
-              every student to excel, lead, and make a difference.
+              {heroSubtitle}
             </p>
 
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
-              <Link href="/admissions">
+              <Link href={heroCtaUrl || "/admissions"}>
                 <Button
                   variant="secondary"
                   size="lg"
                   className="w-full sm:w-auto justify-center"
                 >
-                  Apply Now
+                  {heroCtaLabel}
                 </Button>
               </Link>
               <Link href="/about">
@@ -209,6 +378,7 @@ export default function Home() {
           <div className="lg:col-span-5 w-full">
             <ImagePlaceholder
               label="Pinecrest Main Campus — Front Entrance and Academic Block"
+              src={heroImage}
               aspectRatio="aspect-[4/3]"
               className="shadow-2xl shadow-slate-950/60 border-slate-800"
               icon={<Building className="w-12 h-12 text-slate-600" />}
@@ -224,7 +394,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-6">
-            {stats.map((s, i) => (
+            {statItems.map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <span className="text-3xl md:text-4xl font-black text-amber-500 tracking-tight">
                   {s.number}
@@ -447,10 +617,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {announcements.map((a, i) => (
+            {announcementItems.map((a, i) => (
               <Card key={i} className="flex flex-col h-full">
                 <ImagePlaceholder
                   label={`${a.title} — article image`}
+                  src={a.image}
                   aspectRatio="aspect-video"
                   className="rounded-b-none border-0 border-b border-slate-200/60 dark:border-slate-800/80"
                 />
@@ -512,7 +683,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {upcomingEvents.map((ev, i) => (
+            {eventItems.map((ev, i) => (
               <div
                 key={i}
                 className="flex gap-5 items-start p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
@@ -562,7 +733,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {achievements.map((a, i) => (
+            {achievementItems.map((a, i) => (
               <div
                 key={i}
                 className="flex flex-col gap-4 p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/30 transition-colors duration-300"
@@ -607,10 +778,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {facilities.map((f, i) => (
+            {facilityItems.map((f, i) => (
               <Card key={i} className="flex flex-col h-full">
                 <ImagePlaceholder
                   label={`${f.title} — facility photograph`}
+                  src={f.image}
                   aspectRatio="aspect-[4/3]"
                   className="rounded-b-none border-0 border-b border-slate-200/60 dark:border-slate-800/80"
                 />
@@ -651,16 +823,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              "Students in Science Lab",
-              "Football Match on Main Pitch",
-              "Autumn Drama Rehearsal",
-              "Library Study Session",
-              "Robotics Club Workshop",
-              "School Assembly Morning",
-              "Art Exhibition Display",
-              "Graduation Ceremony",
-            ].map((caption, i) => (
+            {galleryCaptions.map((caption, i) => (
               <div
                 key={i}
                 className="group overflow-hidden rounded-xl border border-slate-200/60 dark:border-slate-800/80"

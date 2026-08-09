@@ -47,7 +47,7 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
     <div
       className={`w-full ${aspectRatio} bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-4 text-center select-none ${className}`}
     >
-      <div className="text-slate-400 dark:text-slate-650 flex flex-col items-center gap-2">
+      <div className="text-slate-400 dark:text-slate-600 flex flex-col items-center gap-2">
         {icon}
         <span className="text-xs font-semibold tracking-wider uppercase opacity-60">
           Image Placeholder

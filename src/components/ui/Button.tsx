@@ -38,11 +38,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary:
         "bg-amber-600 hover:bg-amber-700 text-white border border-transparent focus:ring-amber-500 shadow-md hover:shadow-lg",
       outline:
-        "bg-transparent text-slate-800 dark:text-slate-100 border border-slate-350 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900 focus:ring-slate-850",
+        "bg-transparent text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900 focus:ring-slate-900",
       ghost:
         "bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 focus:ring-slate-400",
       danger:
-        "bg-red-650 hover:bg-red-750 text-white border border-transparent focus:ring-red-500 shadow-md hover:shadow-lg",
+        "bg-red-600 hover:bg-red-700 text-white border border-transparent focus:ring-red-500 shadow-md hover:shadow-lg",
     };
 
     // Sizing map

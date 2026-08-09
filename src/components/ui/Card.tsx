@@ -44,7 +44,7 @@ export const CardTitle = ({
 }: React.HTMLAttributes<HTMLHeadingElement> & { tag?: "h1" | "h2" | "h3" | "h4" }) => {
   return (
     <Tag
-      className={`text-xl font-bold text-slate-850 dark:text-slate-50 tracking-tight ${className}`}
+      className={`text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight ${className}`}
       {...props}
     >
       {children}

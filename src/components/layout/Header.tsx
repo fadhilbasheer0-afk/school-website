@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, Mail, GraduationCap, ChevronRight } from "lucide-react";
 import { Button } from "../ui/Button";
+import type { SchoolSettings } from "@/lib/content";
 
 interface NavLink {
   label: string;
@@ -31,11 +32,18 @@ const quickLinks: NavLink[] = [
 // Combined list for mobile navigation
 const allLinks = [...mainNavLinks, ...quickLinks];
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ settings?: SchoolSettings }> = ({ settings }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
+
+  const schoolName = settings?.schoolName || "PINECREST";
+  const tagline = settings?.tagline || "International Academy";
+  const logoUrl = settings?.logoUrl || null;
+  const phone = settings?.contactPhone || "+1 (800) 555-0199";
+  const email = settings?.contactEmail || "info@pinecrestacademy.edu";
+  const year = new Date().getFullYear();
 
   // Close mobile menu when the route changes (handles browser back/forward too)
   if (prevPathname !== pathname) {
@@ -77,18 +85,18 @@ export const Header: React.FC = () => {
           <div className="hidden lg:flex w-full bg-slate-900 text-slate-300 py-2.5 px-8 justify-between border-b border-slate-800 text-xs">
             <div className="flex items-center gap-6">
               <a
-                href="tel:+18005550199"
+                href={`tel:${phone.replace(/[^+\d]/g, "")}`}
                 className="flex items-center gap-2 hover:text-amber-400 transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
-                <span>+1 (800) 555-0199</span>
+                <span>{phone}</span>
               </a>
               <a
-                href="mailto:info@pinecrestacademy.edu"
+                href={`mailto:${email}`}
                 className="flex items-center gap-2 hover:text-amber-400 transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />
-                <span>info@pinecrestacademy.edu</span>
+                <span>{email}</span>
               </a>
             </div>
             <div className="flex items-center gap-6 font-medium">
@@ -119,15 +127,23 @@ export const Header: React.FC = () => {
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-slate-100 dark:to-white flex items-center justify-center text-white dark:text-slate-900 shadow-md transition-transform group-hover:scale-105">
-              <GraduationCap className="w-6 h-6 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-slate-100 dark:to-white flex items-center justify-center text-white dark:text-slate-900 shadow-md transition-transform group-hover:scale-105 overflow-hidden">
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={`${schoolName} logo`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <GraduationCap className="w-6 h-6 animate-pulse" />
+              )}
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-lg md:text-xl tracking-tight text-slate-900 dark:text-white leading-none">
-                PINECREST
+                {schoolName}
               </span>
               <span className="text-[10px] uppercase font-semibold text-amber-600 dark:text-amber-400 tracking-widest mt-1">
-                International Academy
+                {tagline}
               </span>
             </div>
           </Link>
@@ -138,7 +154,7 @@ export const Header: React.FC = () => {
               <Link
                 key={link.path}
                 href={link.path}
-                className={`relative py-1.5 text-sm font-semibold tracking-wide transition-colors hover:text-amber-605 dark:hover:text-amber-400 ${
+                className={`relative py-1.5 text-sm font-semibold tracking-wide transition-colors hover:text-amber-600 dark:hover:text-amber-400 ${
                   pathname === link.path
                     ? "text-amber-600 dark:text-amber-400"
                     : "text-slate-700 dark:text-slate-200"
@@ -163,7 +179,7 @@ export const Header: React.FC = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-350 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-905 transition-colors focus:outline-none"
+            className="flex lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors focus:outline-none"
             aria-label="Toggle navigation menu"
             id="mobile-nav-toggle"
           >
@@ -192,14 +208,22 @@ export const Header: React.FC = () => {
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={`${schoolName} logo`}
+                  className="w-6 h-6 rounded-lg object-cover"
+                />
+              ) : (
+                <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              )}
               <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">
-                PINECREST
+                {schoolName}
               </span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-55 dark:hover:bg-slate-900"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -227,7 +251,7 @@ export const Header: React.FC = () => {
                     className={`w-4 h-4 transition-transform ${
                       isActive
                         ? "text-amber-500"
-                        : "text-slate-350 dark:text-slate-600 group-hover:translate-x-1"
+                        : "text-slate-300 dark:text-slate-600 group-hover:translate-x-1"
                     }`}
                   />
                 </Link>
@@ -243,7 +267,7 @@ export const Header: React.FC = () => {
               </Button>
             </Link>
             <p className="text-xs text-center text-slate-400 dark:text-slate-500">
-              © {new Date().getFullYear()} Pinecrest Academy.
+              © {year} {schoolName}.
             </p>
           </div>
         </div>

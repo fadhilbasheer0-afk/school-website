@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialLinks } from "@/components/contact/SocialLinks";
 import { siteConfig } from "@/lib/site";
+import { getSchoolSettings, getContactInfo } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -23,77 +24,124 @@ export const metadata: Metadata = {
   },
 };
 
-const contactCards = [
-  {
-    icon: <MapPin className="w-5 h-5" />,
-    title: "School Address",
-    accent: "bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400",
-    body: (
-      <>
-        <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">{siteConfig.address.street}</p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">{siteConfig.address.city}</p>
-      </>
-    ),
-  },
-  {
-    icon: <Phone className="w-5 h-5" />,
-    title: "Phone Numbers",
-    accent: "bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400",
-    body: (
-      <>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-          Main Office:{" "}
-          <a href="tel:+18005550190" className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-amber-600 dark:hover:text-amber-400">
-            {siteConfig.phoneMain}
-          </a>
-        </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-          Admissions:{" "}
-          <a href="tel:+18005550199" className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-amber-600 dark:hover:text-amber-400">
-            {siteConfig.phoneAdmissions}
-          </a>
-        </p>
-      </>
-    ),
-  },
-  {
-    icon: <Mail className="w-5 h-5" />,
-    title: "Emails",
-    accent: "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400",
-    body: (
-      <>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-          General:{" "}
-          <a href={`mailto:${siteConfig.email}`} className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-emerald-600 dark:hover:text-emerald-400">
-            {siteConfig.email}
-          </a>
-        </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
-          Principal:{" "}
-          <a href={`mailto:${siteConfig.principalEmail}`} className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-emerald-600 dark:hover:text-emerald-400">
-            {siteConfig.principalEmail}
-          </a>
-        </p>
-      </>
-    ),
-  },
-  {
-    icon: <Clock className="w-5 h-5" />,
-    title: "Office Hours",
-    accent: "bg-slate-100 dark:bg-slate-850 text-slate-600 dark:text-slate-350",
-    body: (
-      <>
-        {siteConfig.officeHours.map((hours) => (
-          <p key={hours.label} className="text-xs text-slate-500 dark:text-slate-400 font-light">
-            {hours.label}: <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">{hours.value}</span>
-          </p>
-        ))}
-      </>
-    ),
-  },
-];
+export default async function Contact() {
+  const [settings, contactInfo] = await Promise.all([
+    getSchoolSettings(),
+    getContactInfo(),
+  ]);
 
-export default function Contact() {
+  const addressEntry = contactInfo.find((e) => e.type === "address");
+  const phoneEntries = contactInfo.filter((e) => e.type === "phone");
+  const emailEntries = contactInfo.filter((e) => e.type === "email");
+
+  const addressValue =
+    settings.contactAddress ||
+    addressEntry?.value ||
+    `${siteConfig.address.street}, ${siteConfig.address.city}`;
+  const phoneMain =
+    settings.contactPhone || phoneEntries[0]?.value || siteConfig.phoneMain;
+  const phoneAdmissions =
+    phoneEntries[1]?.value || siteConfig.phoneAdmissions;
+  const emailGeneral =
+    settings.contactEmail || emailEntries[0]?.value || siteConfig.email;
+  const emailPrincipal =
+    emailEntries[1]?.value || siteConfig.principalEmail;
+  const officeHours =
+    settings.officeHours.length > 0
+      ? settings.officeHours
+      : siteConfig.officeHours;
+
+  const contactCards = [
+    {
+      icon: <MapPin className="w-5 h-5" />,
+      title: "School Address",
+      accent:
+        "bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400",
+      body: (
+        <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+          {addressValue}
+        </p>
+      ),
+    },
+    {
+      icon: <Phone className="w-5 h-5" />,
+      title: "Phone Numbers",
+      accent:
+        "bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400",
+      body: (
+        <>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+            Main Office:{" "}
+            <a
+              href={`tel:${phoneMain.replace(/[^+\d]/g, "")}`}
+              className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-amber-600 dark:hover:text-amber-400"
+            >
+              {phoneMain}
+            </a>
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+            Admissions:{" "}
+            <a
+              href={`tel:${phoneAdmissions.replace(/[^+\d]/g, "")}`}
+              className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-amber-600 dark:hover:text-amber-400"
+            >
+              {phoneAdmissions}
+            </a>
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: <Mail className="w-5 h-5" />,
+      title: "Emails",
+      accent:
+        "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400",
+      body: (
+        <>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+            General:{" "}
+            <a
+              href={`mailto:${emailGeneral}`}
+              className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+            >
+              {emailGeneral}
+            </a>
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-light">
+            Principal:{" "}
+            <a
+              href={`mailto:${emailPrincipal}`}
+              className="text-sm text-slate-600 dark:text-slate-300 font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+            >
+              {emailPrincipal}
+            </a>
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: <Clock className="w-5 h-5" />,
+      title: "Office Hours",
+      accent:
+        "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300",
+      body: (
+        <>
+          {officeHours.map((hours) => (
+            <p
+              key={hours.label}
+              className="text-xs text-slate-500 dark:text-slate-400 font-light"
+            >
+              {hours.label}:{" "}
+              <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">
+                {hours.value}
+              </span>
+            </p>
+          ))}
+        </>
+      ),
+    },
+  ];
+
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">

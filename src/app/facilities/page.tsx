@@ -1,9 +1,10 @@
 import React from "react";
-import { Check, Eye, Camera } from "lucide-react";
+import { Check, Eye, Camera, Building2, type LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
-import { facilities } from "@/data/facilities";
+import { facilities as staticFacilities } from "@/data/facilities";
+import { getFacilities } from "@/lib/content";
 
 const categoryColor: Record<string, string> = {
   Academic: "text-indigo-600 dark:text-indigo-400",
@@ -13,7 +14,19 @@ const categoryColor: Record<string, string> = {
   Outdoor: "text-emerald-600 dark:text-emerald-400",
 };
 
-export default function Facilities() {
+const iconByTitle = new Map(staticFacilities.map((f) => [f.title, f.icon]));
+const DefaultIcon: LucideIcon = Building2;
+
+export default async function Facilities() {
+  const cmsFacilities = await getFacilities();
+  const items =
+    cmsFacilities.length > 0
+      ? cmsFacilities.map((f) => ({
+          ...f,
+          icon: iconByTitle.get(f.title) ?? DefaultIcon,
+        }))
+      : staticFacilities;
+
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -67,13 +80,14 @@ export default function Facilities() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {facilities.map((facility) => {
+            {items.map((facility) => {
               const Icon = facility.icon;
               return (
                 <Card key={facility.id} className="flex flex-col h-full">
                   {/* Main image placeholder */}
                   <ImagePlaceholder
                     label={facility.mainImage}
+                    src={facility.mainImage}
                     aspectRatio="aspect-video"
                     className="rounded-b-none"
                   />
@@ -128,6 +142,7 @@ export default function Facilities() {
                           <ImagePlaceholder
                             key={image}
                             label={image}
+                            src={image}
                             aspectRatio="aspect-square"
                             icon={
                               <Camera className="w-4 h-4 text-slate-400" />

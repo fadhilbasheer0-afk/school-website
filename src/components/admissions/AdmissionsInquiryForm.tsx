@@ -60,7 +60,7 @@ export const AdmissionsInquiryForm: React.FC = () => {
 
   return (
     <div id="inquiry-form" className="bg-white dark:bg-slate-900/60 p-8 md:p-10 border border-slate-200/50 dark:border-slate-800/80 rounded-3xl shadow-sm">
-      <h2 className="text-2xl font-extrabold text-slate-850 dark:text-white mb-2">
+      <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
         Admissions Inquiry Form
       </h2>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-light">
@@ -68,13 +68,13 @@ export const AdmissionsInquiryForm: React.FC = () => {
       </p>
 
       {success ? (
-        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/40 rounded-2xl p-6 text-center text-emerald-800 dark:text-emerald-300">
+        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-2xl p-6 text-center text-emerald-800 dark:text-emerald-300">
           <ShieldCheck className="w-12 h-12 text-emerald-500 mx-auto mb-3 animate-bounce" />
           <h3 className="font-bold text-lg">Inquiry Registry Success!</h3>
-          <p className="text-xs text-emerald-600 dark:text-emerald-450 mt-1 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 max-w-sm mx-auto leading-relaxed">
             Thank you for submitting. We have dispatched a confirmation email and will contact you directly to schedule an assessment.
           </p>
-          <Button variant="outline" className="mt-6 border-emerald-300 text-emerald-850 dark:text-emerald-400 hover:bg-emerald-100" onClick={() => setSuccess(false)}>
+          <Button variant="outline" className="mt-6 border-emerald-300 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-100" onClick={() => setSuccess(false)}>
             Submit another inquiry
           </Button>
         </div>

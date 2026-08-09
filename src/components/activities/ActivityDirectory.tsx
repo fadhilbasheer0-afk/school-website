@@ -120,6 +120,7 @@ const ActivityCard: React.FC<{ item: ActivityItem }> = ({ item }) => {
     <Card className="flex flex-col h-full">
       <ImagePlaceholder
         label={item.image}
+        src={item.image}
         aspectRatio="aspect-video"
         className="rounded-b-none"
       />

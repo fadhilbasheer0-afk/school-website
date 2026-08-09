@@ -23,6 +23,7 @@ import {
   CardContent,
 } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { getAboutSections } from "@/lib/content";
 
 /* ─── data ──────────────────────────────────────────────── */
 
@@ -135,7 +136,14 @@ const managementTeam = [
 
 /* ─── page ──────────────────────────────────────────────── */
 
-export default function About() {
+export default async function About() {
+  const sections = await getAboutSections();
+  const intro = sections.intro;
+  const vision = sections.vision;
+  const mission = sections.mission;
+  const values = sections.values;
+  const leadership = sections.leadership;
+
   return (
     <div className="w-full flex flex-col font-sans">
       {/* ════════ 1 · INTRODUCTION ════════ */}
@@ -159,25 +167,19 @@ export default function About() {
             </div>
             <div className="lg:col-span-7 flex flex-col gap-5 text-left">
               <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">
-                A Proud Legacy of Leadership and Innovation
+                {intro?.title || "A Proud Legacy of Leadership and Innovation"}
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Founded in 1995 by Dr. James Whitfield and Mrs. Amara Okonkwo,
-                Pinecrest Academy began with a bold vision: to deliver a premium
-                international education that fosters critical thinking, empathy,
-                and a deep respect for diverse cultures. Over the past
-                quarter-century, we have grown from a single classroom building
-                to a state-of-the-art 20-acre campus.
-              </p>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Today, Pinecrest serves more than 1,200 students representing 35
-                nationalities. Our alumni network spans six continents, with
-                graduates attending Ivy League universities, leading tech
-                start-ups, practising medicine, and contributing to public policy
-                at the highest levels. We are proud of every student who has
-                walked through our gates — and deeply committed to the students
-                who will walk through them next.
-              </p>
+              {(intro?.body
+                ? intro.body.split("\n").filter(Boolean)
+                : [
+                    "Founded in 1995 by Dr. James Whitfield and Mrs. Amara Okonkwo, Pinecrest Academy began with a bold vision: to deliver a premium international education that fosters critical thinking, empathy, and a deep respect for diverse cultures. Over the past quarter-century, we have grown from a single classroom building to a state-of-the-art 20-acre campus.",
+                    "Today, Pinecrest serves more than 1,200 students representing 35 nationalities. Our alumni network spans six continents, with graduates attending Ivy League universities, leading tech start-ups, practising medicine, and contributing to public policy at the highest levels. We are proud of every student who has walked through our gates — and deeply committed to the students who will walk through them next.",
+                  ]
+              ).map((paragraph, i) => (
+                <p key={i} className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
               <div className="flex gap-4 mt-2">
                 <Link href="/faculty">
                   <Button variant="primary">Meet the Faculty</Button>
@@ -236,19 +238,24 @@ export default function About() {
               <Lightbulb className="w-6 h-6" />
             </div>
             <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-4">
-              Our Vision
+              {vision?.title || "Our Vision"}
             </h3>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              To be a globally recognized centre of educational excellence that
-              develops principled, creative, and compassionate leaders who shape
-              the future of their communities and the world.
-            </p>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
-              We envision a school where every student feels valued, challenged,
-              and inspired to reach their full potential — academically,
-              socially, and emotionally. Pinecrest graduates will be lifelong
-              learners, critical thinkers, and responsible global citizens.
-            </p>
+            {(vision?.body
+              ? vision.body.split("\n").filter(Boolean)
+              : [
+                  "To be a globally recognized centre of educational excellence that develops principled, creative, and compassionate leaders who shape the future of their communities and the world.",
+                  "We envision a school where every student feels valued, challenged, and inspired to reach their full potential — academically, socially, and emotionally. Pinecrest graduates will be lifelong learners, critical thinkers, and responsible global citizens.",
+                ]
+            ).map((paragraph, i) => (
+              <p
+                key={i}
+                className={`text-slate-600 dark:text-slate-400 leading-relaxed${
+                  i > 0 ? " mt-3" : ""
+                }`}
+              >
+                {paragraph}
+              </p>
+            ))}
           </div>
 
           {/* Mission */}
@@ -257,13 +264,11 @@ export default function About() {
               <Target className="w-6 h-6" />
             </div>
             <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-4">
-              Our Mission
+              {mission?.title || "Our Mission"}
             </h3>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Pinecrest International Academy is committed to providing a
-              rigorous, inclusive, and nurturing education that equips students
-              with the knowledge, skills, and character to thrive in an
-              ever-changing world.
+              {mission?.body ||
+                "Pinecrest International Academy is committed to providing a rigorous, inclusive, and nurturing education that equips students with the knowledge, skills, and character to thrive in an ever-changing world."}
             </p>
             <ul className="mt-4 flex flex-col gap-2 text-slate-600 dark:text-slate-400 text-sm">
               {[
@@ -289,7 +294,7 @@ export default function About() {
           <SectionHeading
             badge="What Guides Us"
             title="Our Core Values"
-            subtitle="These six principles inform every decision we make — from curriculum design to campus culture."
+            subtitle={values?.body || "These six principles inform every decision we make — from curriculum design to campus culture."}
             align="center"
             className="mx-auto"
           />
@@ -374,7 +379,7 @@ export default function About() {
           <SectionHeading
             badge="Leadership"
             title="School Management & Governance"
-            subtitle="The Board of Governors and senior leadership team ensure strategic direction, financial integrity, and educational quality."
+            subtitle={leadership?.body || "The Board of Governors and senior leadership team ensure strategic direction, financial integrity, and educational quality."}
             align="center"
             className="mx-auto"
           />
