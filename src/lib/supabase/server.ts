@@ -7,8 +7,8 @@ import { cookies } from "next/headers";
  * read process.env at runtime, so this reflects the deployed environment.
  */
 export const isSupabaseConfigured = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim() &&
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim()
 );
 
 /**
@@ -19,8 +19,8 @@ export const isSupabaseConfigured = Boolean(
  * so `setAll` failures inside Server Components are safe to ignore.
  */
 export async function createClient(): Promise<SupabaseClient> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
+  const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(

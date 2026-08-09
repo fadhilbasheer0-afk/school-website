@@ -5,8 +5,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * True when the Supabase public credentials are present.
  */
 export const isSupabaseConfigured = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim() &&
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim()
 );
 
 /**
@@ -19,18 +19,26 @@ export const isSupabaseConfigured = Boolean(
  * It uses the anon key only — never the service-role key — and therefore every
  * query is still governed by Row Level Security. Public reads rely on the
  * read-only RLS policies, so this client can never write to protected data.
+ *
+ * Defensive: trims env values and swallows client-construction errors so a
+ * misconfigured env (e.g. an accidentally quoted URL) degrades to the static
+ * seed fallback instead of crashing a build or a request.
  */
 export function createPublicClient(): SupabaseClient | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
+  const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
 
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
-  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
+  try {
+    return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+  } catch {
+    return null;
+  }
 }
