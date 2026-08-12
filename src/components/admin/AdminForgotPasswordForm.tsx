@@ -100,7 +100,7 @@ export const AdminForgotPasswordForm: React.FC = () => {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@pinecrestacademy.edu"
+            placeholder="you@irshadacademy.edu"
             required
           />
         </FormField>

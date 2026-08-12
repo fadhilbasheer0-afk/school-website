@@ -124,7 +124,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
               {article.author}
             </p>
             <p className="text-xs text-slate-400">
-              Pinecrest Academy Communications
+              Irshad Academy Communications
             </p>
           </div>
           <Link href="/news" className="inline-block">

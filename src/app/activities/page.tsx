@@ -29,7 +29,7 @@ export default async function Activities() {
               Building Well-Rounded Leaders
             </h3>
             <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-light">
-              At Pinecrest Academy, we believe education extends far beyond
+              At Irshad Academy, we believe education extends far beyond
               theory. Participation in extracurricular programmes teaches time
               management, resilience, civic duty, and leadership. Every student
               is encouraged to join at least one club and one athletic project

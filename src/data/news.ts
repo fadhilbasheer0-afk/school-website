@@ -37,8 +37,8 @@ export const newsCategories: NewsCategory[] = [
 export const newsArticles: NewsArticle[] = [
   {
     id: "national-merit-finalists",
-    slug: "pinecrest-seniors-achieve-top-ranks-in-national-merit-scholarship",
-    title: "Pinecrest Seniors Achieve Top Ranks in National Merit Scholarship",
+    slug: "irshad-seniors-achieve-top-ranks-in-national-merit-scholarship",
+    title: "Irshad Seniors Achieve Top Ranks in National Merit Scholarship",
     category: "Academic",
     date: "2026-08-05",
     author: "Office of the Principal",
@@ -60,10 +60,10 @@ export const newsArticles: NewsArticle[] = [
     date: "2026-08-02",
     author: "Science Department",
     summary:
-      "Registration is now open for Pinecrest's largest STEM exhibition of the year, welcoming projects across environmental technology, coding, and engineering.",
+      "Registration is now open for Irshad's largest STEM exhibition of the year, welcoming projects across environmental technology, coding, and engineering.",
     content: [
-      "Registration has formally opened for Pinecrest's largest STEM exhibition of the year. The annual Science & Tech Fair invites students from Grades 6 to 12 to present projects spanning environmental technology, computer coding algorithms, and electronics engineering.",
-      "Projects will be judged by a panel of industry engineers, university researchers, and Pinecrest science faculty. Grand prizes include college-level laboratory sponsorships and invitations to regional innovation showcases.",
+      "Registration has formally opened for Irshad's largest STEM exhibition of the year. The annual Science & Tech Fair invites students from Grades 6 to 12 to present projects spanning environmental technology, computer coding algorithms, and electronics engineering.",
+      "Projects will be judged by a panel of industry engineers, university researchers, and Irshad science faculty. Grand prizes include college-level laboratory sponsorships and invitations to regional innovation showcases.",
       "All interested students should register through the school learning portal by September 15. Team projects of up to four members are encouraged, and mentors are available in the innovation lab every Thursday afternoon to help refine project ideas.",
     ],
     image: "Students presenting robotics projects at the science fair",
@@ -94,13 +94,13 @@ export const newsArticles: NewsArticle[] = [
     date: "2026-07-20",
     author: "Athletics Department",
     summary:
-      "The Pinecrest Lizards swim team returned from the state championship with five individual gold medals and a silver relay finish — a school-best record.",
+      "The Irshad Lizards swim team returned from the state championship with five individual gold medals and a silver relay finish — a school-best record.",
     content: [
-      "The Pinecrest Lizards swim team has returned from the secondary schools championship carrying five individual gold medals and a silver team relay finish, marking a school-best record.",
+      "The Irshad Lizards swim team has returned from the secondary schools championship carrying five individual gold medals and a silver team relay finish, marking a school-best record.",
       "The gold-medal performances came in the 100 m freestyle, 200 m freestyle, 100 m breaststroke, 200 m individual medley, and the 50 m butterfly. The team's relay silver was decided in the final leg of the championship race.",
       "Head coach Ricardo Fernandez praised the team's season-long dedication: 'These swimmers trained through winter and spring with remarkable discipline. This record belongs to every member of the squad, not just those on the podium.'",
     ],
-    image: "Pinecrest Lizards on the podium with medals",
+    image: "Irshad Lizards on the podium with medals",
     featured: false,
   },
   {

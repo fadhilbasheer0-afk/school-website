@@ -49,7 +49,7 @@ export default async function Facilities() {
               A Safe, Modern Space Built for Growth
             </h3>
             <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm md:text-base">
-              Pinecrest Academy is committed to secure and sustainable
+              Irshad Academy is committed to secure and sustainable
               environments. Our buildings integrate filtered airflow, central
               air conditioning, backup power, and automated emergency alert
               systems.

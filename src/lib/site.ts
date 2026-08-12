@@ -3,20 +3,20 @@
  * robots. Update these values when the CMS / production domain is connected.
  */
 export const siteConfig = {
-  name: "Pinecrest Academy",
-  legalName: "Pinecrest International Academy",
-  url: "https://www.pinecrestacademy.edu",
+  name: "Irshad Academy",
+  legalName: "Irshad International Academy",
+  url: "https://www.irshadacademy.edu",
   description:
-    "Pinecrest International Academy provides a legacy of academic excellence, personal growth, and global citizenship. Empowering students since 1995.",
+    "Irshad International Academy provides a legacy of academic excellence, personal growth, and global citizenship. Empowering students since 1995.",
   locale: "en_US",
-  email: "info@pinecrestacademy.edu",
-  principalEmail: "principal@pinecrestacademy.edu",
-  admissionsEmail: "admissions@pinecrestacademy.edu",
+  email: "info@irshadacademy.edu",
+  principalEmail: "principal@irshadacademy.edu",
+  admissionsEmail: "admissions@irshadacademy.edu",
   phoneMain: "+1 (800) 555-0190",
   phoneAdmissions: "+1 (800) 555-0199",
   address: {
     street: "125 Academy Road",
-    city: "Pinecrest Hills, NY 10024",
+    city: "New York, NY 10024",
     gps: "40.7128° N, 74.0060° W",
     mapEmbedUrl:
       "https://www.google.com/maps?q=125%20Academy%20Road%2C%20New%20York%2C%20NY%2010024&output=embed",
@@ -29,11 +29,11 @@ export const siteConfig = {
     { label: "Sunday & Holidays", value: "Closed" },
   ],
   social: {
-    facebook: "https://www.facebook.com/pinecrestacademy",
-    twitter: "https://www.twitter.com/pinecrestacademy",
-    instagram: "https://www.instagram.com/pinecrestacademy",
-    linkedin: "https://www.linkedin.com/school/pinecrestacademy",
-    youtube: "https://www.youtube.com/@pinecrestacademy",
+    facebook: "https://www.facebook.com/irshadacademy",
+    twitter: "https://www.twitter.com/irshadacademy",
+    instagram: "https://www.instagram.com/irshadacademy",
+    linkedin: "https://www.linkedin.com/school/irshadacademy",
+    youtube: "https://www.youtube.com/@irshadacademy",
   },
 };
 

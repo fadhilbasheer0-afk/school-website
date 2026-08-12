@@ -11,14 +11,14 @@ import { getSchoolSettings, getContactInfo } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Get in touch with Pinecrest Academy. Find our school address, phone numbers, emails, office hours, campus map, and social media — or send us a message.",
+    "Get in touch with Irshad Academy. Find our school address, phone numbers, emails, office hours, campus map, and social media — or send us a message.",
   alternates: {
     canonical: `${siteConfig.url}/contact`,
   },
   openGraph: {
-    title: "Contact Us | Pinecrest Academy",
+    title: "Contact Us | Irshad Academy",
     description:
-      "Reach Pinecrest Academy by phone, email, or visit our campus. Explore our contact details, office hours, and location map.",
+      "Reach Irshad Academy by phone, email, or visit our campus. Explore our contact details, office hours, and location map.",
     url: `${siteConfig.url}/contact`,
     type: "website",
   },
@@ -185,7 +185,7 @@ export default async function Contact() {
                 Campus Directory
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-light mb-6">
-                Pinecrest Academy welcomes visitors, parents, and community members. Reach the department you need directly — or follow us on social media for daily campus life.
+                Irshad Academy welcomes visitors, parents, and community members. Reach the department you need directly — or follow us on social media for daily campus life.
               </p>
             </div>
 
@@ -240,7 +240,7 @@ export default async function Contact() {
           </div>
           <div className="rounded-3xl overflow-hidden border border-slate-200/60 dark:border-slate-800/80 shadow-xl shadow-slate-100/50 dark:shadow-none">
             <iframe
-              title="Google Map showing the Pinecrest Academy campus at 125 Academy Road, Pinecrest Hills, NY 10024"
+              title="Google Map showing the Irshad Academy campus at 125 Academy Road, New York, NY 10024"
               src={siteConfig.address.mapEmbedUrl}
               width="100%"
               height="480"

@@ -30,14 +30,14 @@ import { getAdmissions } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Admissions & Enrollment",
   description:
-    "Learn about eligibility, classes available, required documents, the admission procedure, important dates, application instructions, and tuition fees at Pinecrest Academy.",
+    "Learn about eligibility, classes available, required documents, the admission procedure, important dates, application instructions, and tuition fees at Irshad Academy.",
   alternates: {
     canonical: `${siteConfig.url}/admissions`,
   },
   openGraph: {
-    title: "Admissions & Enrollment | Pinecrest Academy",
+    title: "Admissions & Enrollment | Irshad Academy",
     description:
-      "Start your child's journey at Pinecrest Academy. Review eligibility, required documents, admission steps, important dates, and tuition fees.",
+      "Start your child's journey at Irshad Academy. Review eligibility, required documents, admission steps, important dates, and tuition fees.",
     url: `${siteConfig.url}/admissions`,
     type: "website",
   },
@@ -190,7 +190,7 @@ export default async function Admissions() {
           as="h1"
           badge="Enrollment"
           title="Admissions & Enrollment"
-          subtitle="Discover how your child can join Pinecrest Academy — from eligibility and required documents to application steps, important dates, and tuition."
+          subtitle="Discover how your child can join Irshad Academy — from eligibility and required documents to application steps, important dates, and tuition."
           align="center"
           className="mx-auto"
         />
@@ -199,20 +199,20 @@ export default async function Admissions() {
         <section aria-labelledby="introduction-heading" className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-24">
           <div className="overflow-hidden rounded-3xl border border-slate-200/60 dark:border-slate-800/80 shadow-lg shadow-slate-100/50 dark:shadow-none">
             <ImagePlaceholder
-              label="Students walking through the Pinecrest Academy main campus courtyard"
+              label="Students walking through the Irshad Academy main campus courtyard"
               aspectRatio="aspect-[4/3]"
               className="rounded-none border-0"
             />
           </div>
           <div>
             <h2 id="introduction-heading" className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Welcome to the Pinecrest Community
+              Welcome to the Irshad Community
             </h2>
             <div className="h-1.5 w-20 bg-gradient-to-r from-amber-500 to-indigo-600 rounded-full mt-4 mb-6" />
             {(byKey.introduction
               ? byKey.introduction.split("\n").filter(Boolean)
               : [
-                  "Since 1995, Pinecrest Academy has welcomed students from more than 35 nationalities into a vibrant, globally-minded learning community. Our admissions process is designed to be transparent and supportive, helping families find the right placement for their child.",
+                  "Since 1995, Irshad Academy has welcomed students from more than 35 nationalities into a vibrant, globally-minded learning community. Our admissions process is designed to be transparent and supportive, helping families find the right placement for their child.",
                   "We review each application holistically — academic records, personal character, and potential — rather than through test scores alone. Scholarships and financial aid are available for qualifying families.",
                 ]
             ).map((paragraph, i) => (
@@ -469,7 +469,7 @@ export default async function Admissions() {
                   Scholarships & Financial Aid
                 </h3>
                 <p className="text-xs text-amber-700/90 dark:text-amber-200/70 leading-relaxed mt-2 font-light">
-                  Pinecrest offers merit-based academic scholarships (up to 50% tuition) and athletic &amp; creative
+                  Irshad offers merit-based academic scholarships (up to 50% tuition) and athletic &amp; creative
                   grants (up to 30%). All figures below are indicative and subject to the annual fee review.
                 </p>
               </div>

@@ -102,8 +102,42 @@ function inList<T extends string>(value: unknown, list: readonly T[], fallback: 
   return (list as readonly string[]).includes(v) ? (v as T) : fallback;
 }
 
+/**
+ * Strips HTML/script fragments and control characters from admin-authored text
+ * before it reaches the public site. React escapes rendered text by default,
+ * but this is defense-in-depth for content that may contain markup and is
+ * cheap to apply on every field read.
+ */
+export function sanitizeText(value: unknown): string {
+  return asString(value)
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+    .replace(/<\s*script[\s\S]*?<\s*\/\s*script\s*>/gi, "")
+    .replace(/<\s*(iframe|object|embed|form)[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+    .replace(/\s(on\w+)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .trim();
+}
+
+/** Only allows safe URL schemes and relative/internal links. */
+export function safeUrl(value: unknown): string {
+  const v = asString(value).trim();
+  if (!v) return "";
+  if (/^(javascript|data|vbscript):/i.test(v)) return "";
+  if (/^(https?:|mailto:|tel:)/i.test(v)) return v;
+  if (v.startsWith("/") || v.startsWith("#") || v.startsWith("?") || v.startsWith(".")) return v;
+  return "";
+}
+
 function asString(value: unknown): string {
-  return typeof value === "string" ? value : "";
+  if (typeof value !== "string") return "";
+  // Defense-in-depth: sanitize every string read from the DB before public
+  // rendering. Plain text passes through untouched; embedded HTML/scripts and
+  // control characters are stripped.
+  return value
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+    .replace(/<\s*script[\s\S]*?<\s*\/\s*script\s*>/gi, "")
+    .replace(/<\s*(iframe|object|embed|form)[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+    .replace(/\s(on\w+)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .trim();
 }
 
 function asStringArray(value: unknown): string[] {
@@ -137,16 +171,19 @@ function toParagraphs(content: unknown, fallbackParagraph?: string): string[] {
  * public tenant. Returns null when the school row is missing — RLS still
  * guarantees only the public school's content is visible anonymously.
  */
+const DEFAULT_SCHOOL_SLUG = "irshad";
+const DEFAULT_SCHOOL_ID = "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d";
+
 async function getDefaultSchoolId(client: SupabaseClient): Promise<string | null> {
   try {
     const { data } = await client
       .from("schools")
       .select("id")
-      .eq("slug", "pinecrest")
+      .eq("slug", DEFAULT_SCHOOL_SLUG)
       .maybeSingle();
-    return data?.id ?? null;
+    return data?.id ?? DEFAULT_SCHOOL_ID;
   } catch {
-    return null;
+    return DEFAULT_SCHOOL_ID;
   }
 }
 
@@ -673,7 +710,7 @@ async function fetchAchievements(): Promise<AchievementItem[]> {
       title: "State Swimming Championship — 5 Gold Medals",
       category: "Sports",
       description:
-        "The Pinecrest Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
+        "The Irshad Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
       date: "2026",
     },
   ];

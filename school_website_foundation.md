@@ -1,4 +1,4 @@
-# Pinecrest Academy Website Foundation
+# Irshad Academy Website Foundation
 
 We have successfully initialized a modern school website using **Next.js App Router**, **React**, **TypeScript**, and **Tailwind CSS**. Below is the architectural outline and design systems.
 

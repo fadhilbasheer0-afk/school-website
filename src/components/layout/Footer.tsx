@@ -34,18 +34,18 @@ const resourceLinks: FooterLink[] = [
 ];
 
 export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) => {
-  const schoolName = settings?.schoolName || "PINECREST";
+  const schoolName = settings?.schoolName || "IRSHAD";
   const tagline = settings?.tagline || "International Academy";
   const logoUrl = settings?.logoUrl || null;
   const footerAbout =
     settings?.footerAbout ||
     "Providing a legacy of academic excellence, personal growth, and global citizenship. Empowering students since 1995.";
-  const address = settings?.contactAddress || "125 Academy Road, Pinecrest Hills, NY 10024";
+  const address = settings?.contactAddress || "125 Academy Road, New York, NY 10024";
   const phone = settings?.contactPhone || "+1 (800) 555-0199";
-  const email = settings?.contactEmail || "info@pinecrestacademy.edu";
+  const email = settings?.contactEmail || "info@irshadacademy.edu";
   const copyright =
     settings?.footerCopyright ||
-    `© ${new Date().getFullYear()} Pinecrest International Academy. All Rights Reserved.`;
+    `© ${new Date().getFullYear()} Irshad International Academy. All Rights Reserved.`;
   const socialLinks = settings?.socialLinks || {};
   const year = new Date().getFullYear();
 

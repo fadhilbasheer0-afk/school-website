@@ -38,11 +38,11 @@ export const Header: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
 
-  const schoolName = settings?.schoolName || "PINECREST";
+  const schoolName = settings?.schoolName || "IRSHAD";
   const tagline = settings?.tagline || "International Academy";
   const logoUrl = settings?.logoUrl || null;
   const phone = settings?.contactPhone || "+1 (800) 555-0199";
-  const email = settings?.contactEmail || "info@pinecrestacademy.edu";
+  const email = settings?.contactEmail || "info@irshadacademy.edu";
   const year = new Date().getFullYear();
 
   // Close mobile menu when the route changes (handles browser back/forward too)

@@ -51,7 +51,7 @@ const staticAnnouncements = [
   {
     tag: "Academic",
     tagColor: "text-indigo-600 dark:text-indigo-400",
-    title: "Pinecrest Seniors Achieve Top Ranks in National Merit Scholarship",
+    title: "Irshad Seniors Achieve Top Ranks in National Merit Scholarship",
     excerpt:
       "Fifteen of our graduating seniors have been named semi-finalists in the 2026 National Merit Scholarship program, placing them in the top 1% nationwide.",
     date: "Aug 05, 2026",
@@ -118,7 +118,7 @@ const staticAchievements = [
     icon: <Star className="w-6 h-6 text-emerald-500" />,
     title: "State Swimming Championship — 5 Gold Medals",
     description:
-      "The Pinecrest Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
+      "The Irshad Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
   },
 ];
 
@@ -152,7 +152,7 @@ const staticFacilities = [
 const staticHero = {
   title: "Nurturing Minds, Inspiring Futures",
   subtitle:
-    "Welcome to Pinecrest Academy — where academic rigour, character development, and global citizenship come together. We empower every student to excel, lead, and make a difference.",
+    "Welcome to Irshad Academy — where academic rigour, character development, and global citizenship come together. We empower every student to excel, lead, and make a difference.",
   imageUrl: null as string | null,
   ctaLabel: "Apply Now",
   ctaUrl: "/admissions",
@@ -331,7 +331,7 @@ export default async function Home() {
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-extrabold tracking-tight leading-none text-white">
-                  PINECREST
+                  IRSHAD
                 </span>
                 <span className="text-[10px] uppercase font-semibold text-amber-500 tracking-[0.2em] mt-0.5">
                   International Academy
@@ -377,7 +377,7 @@ export default async function Home() {
           {/* right hero image */}
           <div className="lg:col-span-5 w-full">
             <ImagePlaceholder
-              label="Pinecrest Main Campus — Front Entrance and Academic Block"
+              label="Irshad Main Campus — Front Entrance and Academic Block"
               src={heroImage}
               aspectRatio="aspect-[4/3]"
               className="shadow-2xl shadow-slate-950/60 border-slate-800"
@@ -416,13 +416,13 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
           <div className="lg:col-span-7 flex flex-col gap-5 text-left">
             <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-              Welcome to Pinecrest
+              Welcome to Irshad
             </span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
               A Legacy of Excellence Since 1995
             </h2>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              For over twenty-five years, Pinecrest International Academy has
+              For over twenty-five years, Irshad International Academy has
               set the standard for holistic education. Our rigorous academic
               programs, combined with a wide range of co-curricular activities,
               develop confident, caring, and creative young people who are
@@ -454,7 +454,7 @@ export default async function Home() {
 
           <div className="lg:col-span-5">
             <ImagePlaceholder
-              label="Aerial view of Pinecrest campus showing academic blocks, sports fields, and gardens"
+              label="Aerial view of Irshad campus showing academic blocks, sports fields, and gardens"
               aspectRatio="aspect-[4/3]"
               icon={<Globe className="w-10 h-10 text-slate-400" />}
             />
@@ -498,7 +498,7 @@ export default async function Home() {
               A Message from Our Principal
             </h2>
             <blockquote className="border-l-4 border-amber-500 pl-5 text-slate-600 dark:text-slate-400 leading-relaxed italic">
-              &ldquo;At Pinecrest, we believe that every child is capable of
+              &ldquo;At Irshad, we believe that every child is capable of
               extraordinary things. Our role as educators is not merely to
               impart knowledge, but to ignite a passion for lifelong learning.
               We cultivate an environment where curiosity is encouraged,
@@ -508,7 +508,7 @@ export default async function Home() {
               Our dedicated team of educators works closely with families to
               ensure that each student receives the support and challenge
               they need to thrive. Whether your child is just beginning their
-              educational journey or preparing for university, Pinecrest
+              educational journey or preparing for university, Irshad
               Academy offers a nurturing yet rigorous path forward.
             </p>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -535,7 +535,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <SectionHeading
             badge="Our Pillars"
-            title="The Pinecrest Approach"
+            title="The Irshad Approach"
             subtitle="We provide a balanced education focused on intellectual growth, physical development, and ethical leadership."
             align="center"
           />
@@ -810,7 +810,7 @@ export default async function Home() {
                 Campus Snapshots
               </span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">
-                Life at Pinecrest
+                Life at Irshad
               </h2>
             </div>
             <Link
@@ -851,13 +851,13 @@ export default async function Home() {
             <GraduationCap className="w-7 h-7 text-amber-500" />
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
-            Begin Your Child&rsquo;s Journey at Pinecrest
+            Begin Your Child&rsquo;s Journey at Irshad
           </h2>
           <p className="text-slate-400 max-w-2xl leading-relaxed">
             Applications for the 2026–27 academic year are now open. Schedule a
             campus visit, speak with our admissions counsellors, or submit an
             inquiry online. We look forward to welcoming your family to the
-            Pinecrest community.
+            Irshad community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <Link href="/admissions">

@@ -177,7 +177,7 @@ const staticDocuments = [
   {
     title: "School Prospectus 2026–27",
     description:
-      "A comprehensive overview of Pinecrest Academy's programmes, facilities, admissions, and fees.",
+      "A comprehensive overview of Irshad Academy's programmes, facilities, admissions, and fees.",
     fileType: "PDF",
     fileSize: "4.2 MB",
     url: "",
@@ -338,7 +338,7 @@ export default async function Academics() {
                 A Curriculum Driven by Rigour and Passion
               </h3>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                At Pinecrest Academy, we design learning experiences that go far
+                At Irshad Academy, we design learning experiences that go far
                 beyond textbooks. Our academic programme integrates the
                 International Baccalaureate framework, Cambridge IGCSE pathways,
                 and Advanced Placement courses — delivered by a faculty of over
@@ -459,7 +459,7 @@ export default async function Academics() {
               Internationally Recognized Pathways
             </h2>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Pinecrest Academy offers three internationally recognized
+              Irshad Academy offers three internationally recognized
               curriculum frameworks, allowing families to choose the pathway
               that best suits their child&rsquo;s goals and learning style:
             </p>

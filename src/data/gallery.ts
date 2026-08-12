@@ -57,7 +57,7 @@ export const galleryImages: GalleryImage[] = [
     id: "swimming-gala",
     src: null,
     alt: "Inter-School Swimming Gala",
-    caption: "Students representing Pinecrest in the 100 m freestyle championship.",
+    caption: "Students representing Irshad in the 100 m freestyle championship.",
     category: "Athletics",
     order: 4,
   },

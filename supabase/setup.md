@@ -1,6 +1,6 @@
 # Supabase Setup Guide
 
-This guide walks through connecting the Pinecrest Academy site to Supabase.
+This guide walks through connecting the Irshad Academy site to Supabase.
 The project includes a complete SQL schema (`schema.sql`) and the auth
 infrastructure for the `/admin` area. No code is written in this guide — you
 only point Supabase at your project and run the schema.
@@ -47,6 +47,12 @@ only point Supabase at your project and run the schema.
 The script creates every table, index, trigger, Row Level Security (RLS)
 policy, the `school-media` and `school-assets` storage buckets, and a seed
 school. It is safe to re-run.
+
+> **Upgrading a database that still contains the old "Pinecrest" seed?** Run
+> `supabase/migrations/20260812_rebrand_pinecrest_to_irshad.sql` after the
+> schema. It renames the school row and rewrites branding inside every CMS
+> table in place (no data loss, safe to re-run). See the migration file header
+> for details.
 
 ## 4. Enable email authentication
 

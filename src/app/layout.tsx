@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: "school, academy, international school, education, high school, pinecrest",
+  keywords: "school, academy, international school, education, high school, irshad",
   alternates: {
     canonical: siteConfig.url,
   },

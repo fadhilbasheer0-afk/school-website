@@ -52,11 +52,11 @@ export const events: SchoolEvent[] = [
     title: "Annual Inter-School Sports Gala",
     category: "Sports",
     description:
-      "Pinecrest hosts eight regional high schools competing in track athletics, 50 m swimming relays, basketball leagues, and tennis brackets. Come support the Lizards!",
+      "Irshad hosts eight regional high schools competing in track athletics, 50 m swimming relays, basketball leagues, and tennis brackets. Come support the Lizards!",
     startDate: "2026-08-25",
     startTime: "08:00",
     endTime: "16:00",
-    venue: "Pinecrest Sports Track & Complex",
+    venue: "Irshad Sports Track & Complex",
     image: "Athletes competing at the inter-school sports gala",
   },
   {
@@ -104,7 +104,7 @@ export const events: SchoolEvent[] = [
     title: "Annual Spring Fête & Alumni Reunion",
     category: "Community",
     description:
-      "A campus-wide celebration with student performances, stalls, and an alumni reunion that brings the Pinecrest community together.",
+      "A campus-wide celebration with student performances, stalls, and an alumni reunion that brings the Irshad community together.",
     startDate: "2026-04-18",
     startTime: "11:00",
     endTime: "16:00",
@@ -130,7 +130,7 @@ export const events: SchoolEvent[] = [
     title: "State Interschool Swimming Championships",
     category: "Sports",
     description:
-      "The Pinecrest Lizards competed in the state finals, securing five gold medals and a relay silver — a school-best result.",
+      "The Irshad Lizards competed in the state finals, securing five gold medals and a relay silver — a school-best result.",
     startDate: "2026-02-07",
     startTime: "07:30",
     endTime: "15:00",
