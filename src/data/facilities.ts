@@ -151,7 +151,7 @@ export const facilities: Facility[] = [
       "Trained & vetted drivers",
       "Live parent tracking app",
     ],
-    mainImage: "Irshad school buses lined up at the main gate",
+    mainImage: "School buses lined up at the main gate",
     galleryImages: [
       "Bus boarding supervision",
       "Fleet dispatch & maintenance bay",

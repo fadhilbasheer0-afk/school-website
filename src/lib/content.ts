@@ -172,7 +172,7 @@ function toParagraphs(content: unknown, fallbackParagraph?: string): string[] {
  * public tenant. Returns null when the school row is missing — RLS still
  * guarantees only active schools' content is visible anonymously.
  */
-const DEFAULT_SCHOOL_SLUG = "irshad";
+const DEFAULT_SCHOOL_SLUG = "demo-school";
 const DEFAULT_SCHOOL_ID = "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d";
 
 async function getDefaultSchoolId(client: SupabaseClient): Promise<string | null> {
@@ -408,7 +408,7 @@ function mapAnnouncement(row: Row): NewsArticle {
   };
 }
 
-async function fetchAnnouncements(): Promise<NewsArticle[]> {
+async function fetchAnnouncements(_cursor?: undefined, schoolId?: string | null): Promise<NewsArticle[]> {
   return fetchTable(
     "announcements",
     mapAnnouncement,
@@ -417,6 +417,7 @@ async function fetchAnnouncements(): Promise<NewsArticle[]> {
       orderBy: "published_at",
       ascending: false,
       eq: { is_published: true },
+      schoolId,
     }
   );
 }
@@ -458,11 +459,12 @@ function mapEvent(row: Row): SchoolEvent {
   };
 }
 
-async function fetchEvents(): Promise<SchoolEvent[]> {
+async function fetchEvents(schoolId?: string | null): Promise<SchoolEvent[]> {
   return fetchTable("events", mapEvent, staticEvents, {
     orderBy: "start_date",
     ascending: true,
     eq: { is_published: true },
+    schoolId,
   });
 }
 
@@ -504,9 +506,9 @@ function mapTeacher(row: Row): FacultyMember {
   };
 }
 
-async function fetchTeachers(): Promise<FacultyMember[]> {
+async function fetchTeachers(_cursor?: undefined, schoolId?: string | null): Promise<FacultyMember[]> {
   return withClient(async (client) => {
-    const schoolId = await getDefaultSchoolId(client);
+    schoolId = schoolId || await getDefaultSchoolId(client);
     let query = client
       .from("teachers")
       .select("*, academic_departments(name)")
@@ -540,9 +542,9 @@ function mapPhoto(row: Row): GalleryImage {
   };
 }
 
-async function fetchGalleryImages(): Promise<GalleryImage[]> {
+async function fetchGalleryImages(_cursor?: undefined, schoolId?: string | null): Promise<GalleryImage[]> {
   return withClient(async (client) => {
-    const schoolId = await getDefaultSchoolId(client);
+    schoolId = schoolId || await getDefaultSchoolId(client);
     let query = client
       .from("gallery_photos")
       .select("*, gallery_albums(slug, title)")
@@ -559,9 +561,9 @@ async function fetchGalleryImages(): Promise<GalleryImage[]> {
 
 export const getGalleryImages = cacheable(fetchGalleryImages, ["gallery-photos"], CACHE_TAGS.gallery);
 
-async function fetchGalleryAlbums(): Promise<GalleryAlbum[]> {
+async function fetchGalleryAlbums(schoolId?: string | null): Promise<GalleryAlbum[]> {
   return withClient(async (client) => {
-    const schoolId = await getDefaultSchoolId(client);
+    schoolId = schoolId || await getDefaultSchoolId(client);
     let query = client
       .from("gallery_albums")
       .select("id, title, slug, description, cover_image_url")
@@ -632,10 +634,11 @@ function mapActivity(row: Row): ActivityItem {
   };
 }
 
-async function fetchActivities(): Promise<ActivityItem[]> {
+async function fetchActivities(schoolId?: string | null): Promise<ActivityItem[]> {
   return fetchTable("activities", mapActivity, staticActivities, {
     orderBy: "sort_order",
     ascending: true,
+    schoolId,
   });
 }
 
@@ -675,10 +678,11 @@ const seedFacilities: PublicFacility[] = staticFacilities.map((f) => ({
   galleryImages: f.galleryImages,
 }));
 
-async function fetchFacilities(): Promise<PublicFacility[]> {
+async function fetchFacilities(_cursor?: undefined, schoolId?: string | null): Promise<PublicFacility[]> {
   return fetchTable("facilities", mapFacility, seedFacilities, {
     orderBy: "sort_order",
     ascending: true,
+    schoolId,
   });
 }
 
@@ -699,7 +703,7 @@ export const getFacilityBySlug = cacheable(fetchFacilityBySlug, ["facility"], CA
 
 /* ─── achievements / home stats / hero ────────────────────── */
 
-async function fetchAchievements(): Promise<AchievementItem[]> {
+async function fetchAchievements(schoolId?: string | null): Promise<AchievementItem[]> {
   const fallback: AchievementItem[] = [
     {
       id: "national-science-olympiad",
@@ -722,7 +726,7 @@ async function fetchAchievements(): Promise<AchievementItem[]> {
       title: "State Swimming Championship — 5 Gold Medals",
       category: "Sports",
       description:
-        "The Irshad Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
+        "The school swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
       date: "2026",
     },
   ];
@@ -740,13 +744,13 @@ async function fetchAchievements(): Promise<AchievementItem[]> {
       };
     },
     fallback,
-    { orderBy: "sort_order", ascending: true }
+    { orderBy: "sort_order", ascending: true, schoolId }
   );
 }
 
 export const getAchievements = cacheable(fetchAchievements, ["achievements"], CACHE_TAGS.achievements);
 
-async function fetchHomeStats(): Promise<HomeStat[]> {
+async function fetchHomeStats(schoolId?: string | null): Promise<HomeStat[]> {
   const fallback: HomeStat[] = [
     { value: "25+", label: "Years of Excellence" },
     { value: "1,200+", label: "Students Enrolled" },
@@ -762,13 +766,13 @@ async function fetchHomeStats(): Promise<HomeStat[]> {
       label: asString(row.label),
     }),
     fallback,
-    { orderBy: "sort_order", ascending: true }
+    { orderBy: "sort_order", ascending: true, schoolId }
   );
 }
 
 export const getHomeStats = cacheable(fetchHomeStats, ["home-stats"], CACHE_TAGS.home);
 
-async function fetchHeroSlides(): Promise<HeroSlide[]> {
+async function fetchHeroSlides(schoolId?: string | null): Promise<HeroSlide[]> {
   return fetchTable(
     "home_hero_slides",
     (row: Row): HeroSlide => ({
@@ -779,7 +783,7 @@ async function fetchHeroSlides(): Promise<HeroSlide[]> {
       ctaUrl: asString(row.cta_url),
     }),
     [],
-    { orderBy: "sort_order", ascending: true }
+    { orderBy: "sort_order", ascending: true, schoolId }
   );
 }
 
@@ -788,7 +792,7 @@ export const getHeroSlides = cacheable(fetchHeroSlides, ["hero-slides"], CACHE_T
 /* ─── settings & contact ──────────────────────────────────── */
 
 function fallbackSettings(schoolId?: string | null): SchoolSettings {
-  let matchedMock = MOCK_TENANTS.irshad;
+  let matchedMock = MOCK_TENANTS["demo-school"];
   if (schoolId) {
     const found = Object.values(MOCK_TENANTS).find(
       (m) => m.id === schoolId || m.slug === schoolId.toLowerCase()
@@ -798,12 +802,12 @@ function fallbackSettings(schoolId?: string | null): SchoolSettings {
 
   return {
     schoolName: matchedMock.name,
-    tagline: matchedMock.motto || "International Academy",
+    tagline: matchedMock.motto || "",
     logoUrl: matchedMock.theme.logoUrl,
     primaryColor: matchedMock.theme.primaryColor,
     contactEmail: matchedMock.email || siteConfig.email,
     contactPhone: matchedMock.phone || siteConfig.phoneMain,
-    contactAddress: matchedMock.address || `${siteConfig.address.street}, ${siteConfig.address.city}`,
+    contactAddress: matchedMock.address || [siteConfig.address.street, siteConfig.address.city].filter(Boolean).join(", "),
     websiteUrl: matchedMock.website || siteConfig.url,
     mapUrl: siteConfig.address.mapEmbedUrl,
     coordinates: siteConfig.address.gps,
@@ -873,7 +877,7 @@ async function fetchSchoolSettings(schoolId?: string | null): Promise<SchoolSett
 
 export const getSchoolSettings = cacheable(fetchSchoolSettings, ["school-settings"], CACHE_TAGS.settings);
 
-async function fetchContactInfo(): Promise<ContactEntry[]> {
+async function fetchContactInfo(schoolId?: string | null): Promise<ContactEntry[]> {
   const fallback: ContactEntry[] = [
     {
       id: "address",
@@ -907,7 +911,7 @@ async function fetchContactInfo(): Promise<ContactEntry[]> {
       isPrimary: Boolean(row.is_primary),
     }),
     fallback,
-    { orderBy: "sort_order", ascending: true }
+    { orderBy: "sort_order", ascending: true, schoolId }
   );
 }
 
@@ -915,9 +919,9 @@ export const getContactInfo = cacheable(fetchContactInfo, ["contact-info"], CACH
 
 /* ─── about & academics (CMS content sections) ────────────── */
 
-async function fetchAboutSections(): Promise<Record<string, AboutSection>> {
+async function fetchAboutSections(schoolId?: string | null): Promise<Record<string, AboutSection>> {
   return withClient(async (client) => {
-    const schoolId = await getDefaultSchoolId(client);
+    schoolId = schoolId || await getDefaultSchoolId(client);
     let query = client
       .from("about_content")
       .select("section_key, title, body, image_url")
@@ -940,7 +944,7 @@ async function fetchAboutSections(): Promise<Record<string, AboutSection>> {
 
 export const getAboutSections = cacheable(fetchAboutSections, ["about-sections"], CACHE_TAGS.about);
 
-async function fetchAdmissions(): Promise<PublicAdmissionSection[]> {
+async function fetchAdmissions(schoolId?: string | null): Promise<PublicAdmissionSection[]> {
   return fetchTable(
     "admissions",
     (row: Row): PublicAdmissionSection => ({
@@ -950,13 +954,13 @@ async function fetchAdmissions(): Promise<PublicAdmissionSection[]> {
       body: asString(row.body),
     }),
     [],
-    { orderBy: "sort_order", ascending: true }
+    { orderBy: "sort_order", ascending: true, schoolId }
   );
 }
 
 export const getAdmissions = cacheable(fetchAdmissions, ["admissions"], CACHE_TAGS.admissions);
 
-async function fetchAcademicData(): Promise<AcademicData> {
+async function fetchAcademicData(schoolId?: string | null): Promise<AcademicData> {
   const [classes, departments, calendar, documents] = await Promise.all([
     fetchTable(
       "academic_classes",
@@ -968,7 +972,7 @@ async function fetchAcademicData(): Promise<AcademicData> {
         description: asString(row.description),
       }),
       [],
-      { orderBy: "sort_order", ascending: true }
+      { orderBy: "sort_order", ascending: true, schoolId }
     ),
     fetchTable(
       "academic_departments",
@@ -978,7 +982,7 @@ async function fetchAcademicData(): Promise<AcademicData> {
         description: asString(row.description),
       }),
       [],
-      { orderBy: "sort_order", ascending: true }
+      { orderBy: "sort_order", ascending: true, schoolId }
     ),
     fetchTable(
       "academic_calendar",
@@ -989,7 +993,7 @@ async function fetchAcademicData(): Promise<AcademicData> {
         description: asString(row.description),
       }),
       [],
-      { orderBy: "sort_order", ascending: true }
+      { orderBy: "sort_order", ascending: true, schoolId }
     ),
     fetchTable(
       "documents",
@@ -1001,7 +1005,7 @@ async function fetchAcademicData(): Promise<AcademicData> {
         category: asString(row.category),
       }),
       [],
-      { orderBy: "sort_order", ascending: true }
+      { orderBy: "sort_order", ascending: true, schoolId }
     ),
   ]);
   return { classes, departments, calendar, documents };

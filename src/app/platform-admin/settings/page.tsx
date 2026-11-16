@@ -5,8 +5,8 @@ import { updatePlatformSettings } from "@/lib/admin/actions/platform";
 
 export default async function PlatformGlobalSettingsPage() {
   let settings = {
-    platform_name: "EduSaaS Multi-School Platform",
-    support_email: "support@edusaas.com",
+    platform_name: "School Multi-School Platform",
+    support_email: "support@example.com",
     allow_school_registration: true,
     maintenance_mode: false,
     announcement: "",

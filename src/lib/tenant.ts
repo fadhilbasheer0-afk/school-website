@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { unstable_cache } from "next/cache";
 import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
 import { siteConfig } from "@/lib/site";
+export { getTenantUrl } from "@/lib/tenant-url";
 
 export interface SchoolTheme {
   primaryColor: string;
@@ -72,16 +73,16 @@ export interface TenantContext {
 /* ─── Static Mock Tenants for Offline / Seed Fallback ─── */
 
 export const MOCK_TENANTS: Record<string, TenantContext> = {
-  irshad: {
+  "demo-school": {
     id: "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d",
-    slug: "irshad",
-    name: "Irshad Academy",
-    motto: "Legacy of Academic Excellence, Personal Growth, and Global Citizenship",
-    establishedYear: 1995,
-    address: "125 Academy Road, New York, NY 10024",
-    phone: "+1 (800) 555-0199",
-    email: "info@irshadacademy.edu",
-    website: "https://www.irshadacademy.edu",
+    slug: "demo-school",
+    name: "Demo School",
+    motto: null,
+    establishedYear: null,
+    address: null,
+    phone: null,
+    email: null,
+    website: null,
     isActive: true,
     subscriptionTier: "pro",
     theme: {
@@ -94,16 +95,16 @@ export const MOCK_TENANTS: Record<string, TenantContext> = {
       bannerUrl: null,
     },
   },
-  pinecrest: {
+  "sample-school": {
     id: "8b15e8d9-5c9f-5a1e-8f4d-3a7a7e5b2c6e",
-    slug: "pinecrest",
-    name: "Pinecrest Prep Academy",
-    motto: "Cultivating Tomorrow's Leaders Through Inquiry and Character",
-    establishedYear: 2004,
-    address: "450 Forest Crest Boulevard, Boulder, CO 80302",
-    phone: "+1 (303) 555-0142",
-    email: "contact@pinecrestprep.org",
-    website: "https://www.pinecrestprep.org",
+    slug: "sample-school",
+    name: "Sample School",
+    motto: null,
+    establishedYear: null,
+    address: null,
+    phone: null,
+    email: null,
+    website: null,
     isActive: true,
     subscriptionTier: "enterprise",
     theme: {
@@ -116,16 +117,16 @@ export const MOCK_TENANTS: Record<string, TenantContext> = {
       bannerUrl: null,
     },
   },
-  oakridge: {
+  "example-school": {
     id: "9c26f9ea-6da0-6b2f-9a5e-4b8b8f6c3d7f",
-    slug: "oakridge",
-    name: "Oakridge International",
-    motto: "Inspiring Innovation, Creativity, and Ethical Leadership",
-    establishedYear: 2011,
-    address: "88 Horizon Way, Austin, TX 78701",
-    phone: "+1 (512) 555-0188",
-    email: "admissions@oakridgeintl.edu",
-    website: "https://www.oakridgeintl.edu",
+    slug: "example-school",
+    name: "Example School",
+    motto: null,
+    establishedYear: null,
+    address: null,
+    phone: null,
+    email: null,
+    website: null,
     isActive: true,
     subscriptionTier: "starter",
     theme: {
@@ -246,10 +247,15 @@ async function fetchTenantFromDb(identifier: { slug?: string; id?: string; domai
  * 4. Database lookup or default active tenant
  * 5. Fallback mock tenant
  */
-export async function resolveTenant(explicit?: { slug?: string; domain?: string }): Promise<TenantContext> {
+export async function resolveTenant(explicit?: { slug?: string; id?: string; domain?: string }): Promise<TenantContext> {
   let slug = explicit?.slug?.trim().toLowerCase();
   let domain = explicit?.domain?.trim().toLowerCase();
   let isPathScoped = Boolean(slug);
+
+  if (explicit?.id) {
+    const dbTenant = await fetchTenantFromDb({ id: explicit.id });
+    if (dbTenant) return dbTenant;
+  }
 
   if (!slug && !domain) {
     try {
@@ -265,7 +271,7 @@ export async function resolveTenant(explicit?: { slug?: string; domain?: string 
       } else if (host) {
         // Strip port
         const hostname = host.split(":")[0].toLowerCase();
-        // Check for subdomain e.g. pinecrest.localhost or pinecrest.edusaas.com
+        // Check for subdomain e.g. demo-school.localhost or demo-school.example.com
         const parts = hostname.split(".");
         if (parts.length > 2 && !["www", "admin", "platform", "api"].includes(parts[0])) {
           slug = parts[0];
@@ -299,8 +305,8 @@ export async function resolveTenant(explicit?: { slug?: string; domain?: string 
     return defaultDb;
   }
 
-  // 3. Fallback to default mock tenant (Irshad)
-  return { ...MOCK_TENANTS.irshad, isPathScoped: false };
+  // 3. Fallback to the neutral demo tenant
+  return { ...MOCK_TENANTS["demo-school"], isPathScoped: false };
 }
 
 /**
@@ -423,18 +429,4 @@ export async function isPageEnabled(schoolId: string, pageKey: string): Promise<
   const pages = await getSchoolPages(schoolId);
   const found = pages.find((p) => p.pageKey === pageKey || p.slug === pageKey);
   return found ? found.isEnabled : true;
-}
-
-/**
- * Builds a tenant-aware URL for navigation links.
- * When path-scoped (/s/[slug]), prefixes links with /s/[slug].
- * Otherwise, links to standard root paths (/about, /academics).
- */
-export function getTenantUrl(tenant: TenantContext, path: string): string {
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  if (tenant.isPathScoped) {
-    if (cleanPath === "/") return `/s/${tenant.slug}`;
-    return `/s/${tenant.slug}${cleanPath}`;
-  }
-  return cleanPath;
 }

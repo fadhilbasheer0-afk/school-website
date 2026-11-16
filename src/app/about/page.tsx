@@ -71,7 +71,7 @@ const coreValues = [
 const milestones = [
   {
     year: "1995",
-    title: "Irshad School Founded",
+    title: "School Founded",
     description:
       "Opened with 120 primary-grade students and 8 teachers in a single rented building, driven by the vision of founders Dr. James Whitfield and Mrs. Amara Okonkwo.",
   },
@@ -117,7 +117,7 @@ const managementTeam = [
   {
     name: "Dr. James L. Whitfield",
     role: "Chairman, Board of Governors",
-    bio: "Co-founder of Irshad Academy with 30 years of experience in educational administration. Holds a Ph.D. in Curriculum Design from Stanford University.",
+    bio: "Co-founder of the school with 30 years of experience in educational administration. Holds a Ph.D. in Curriculum Design from Stanford University.",
   },
   {
     name: "Mrs. Amara N. Okonkwo",
@@ -178,8 +178,8 @@ export default async function About() {
               {(intro?.body
                 ? intro.body.split("\n").filter(Boolean)
                 : [
-                    "Founded in 1995 by Dr. James Whitfield and Mrs. Amara Okonkwo, Irshad Academy began with a bold vision: to deliver a premium international education that fosters critical thinking, empathy, and a deep respect for diverse cultures. Over the past quarter-century, we have grown from a single classroom building to a state-of-the-art 20-acre campus.",
-                    "Today, Irshad serves more than 1,200 students representing 35 nationalities. Our alumni network spans six continents, with graduates attending Ivy League universities, leading tech start-ups, practising medicine, and contributing to public policy at the highest levels. We are proud of every student who has walked through our gates — and deeply committed to the students who will walk through them next.",
+                    "Founded in 1995 by Dr. James Whitfield and Mrs. Amara Okonkwo, the school began with a bold vision: to deliver a premium international education that fosters critical thinking, empathy, and a deep respect for diverse cultures. Over the past quarter-century, we have grown from a single classroom building to a state-of-the-art 20-acre campus.",
+                    "Today, the school serves more than 1,200 students representing 35 nationalities. Our alumni network spans six continents, with graduates attending Ivy League universities, leading tech start-ups, practising medicine, and contributing to public policy at the highest levels. We are proud of every student who has walked through our gates — and deeply committed to the students who will walk through them next.",
                   ]
               ).map((paragraph, i) => (
                 <p key={i} className="text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -250,7 +250,7 @@ export default async function About() {
               ? vision.body.split("\n").filter(Boolean)
               : [
                   "To be a globally recognized centre of educational excellence that develops principled, creative, and compassionate leaders who shape the future of their communities and the world.",
-                  "We envision a school where every student feels valued, challenged, and inspired to reach their full potential — academically, socially, and emotionally. Irshad graduates will be lifelong learners, critical thinkers, and responsible global citizens.",
+                  "We envision a school where every student feels valued, challenged, and inspired to reach their full potential — academically, socially, and emotionally. Graduates of the school will be lifelong learners, critical thinkers, and responsible global citizens.",
                 ]
             ).map((paragraph, i) => (
               <p
@@ -274,7 +274,7 @@ export default async function About() {
             </h3>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               {mission?.body ||
-                "Irshad International Academy is committed to providing a rigorous, inclusive, and nurturing education that equips students with the knowledge, skills, and character to thrive in an ever-changing world."}
+                "The school is committed to providing a rigorous, inclusive, and nurturing education that equips students with the knowledge, skills, and character to thrive in an ever-changing world."}
             </p>
             <ul className="mt-4 flex flex-col gap-2 text-slate-600 dark:text-slate-400 text-sm">
               {[
@@ -354,7 +354,7 @@ export default async function About() {
               A Message to Our Community
             </h2>
             <blockquote className="border-l-4 border-amber-500 pl-5 text-slate-600 dark:text-slate-400 leading-relaxed italic">
-              &ldquo;At Irshad, we believe that every child is capable of
+              &ldquo;At the school, we believe that every child is capable of
               extraordinary things. Our role as educators is not merely to
               impart knowledge, but to ignite a passion for lifelong learning.
               We cultivate an environment where curiosity is encouraged,
@@ -362,7 +362,7 @@ export default async function About() {
             </blockquote>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               In my fifteen years as Principal, I have seen first-hand the
-              transformative power of a Irshad education. Our students arrive
+              transformative power of an education at the school. Our students arrive
               curious and leave confident — ready to contribute meaningfully to
               their communities and beyond. I am immensely proud of our
               faculty&rsquo;s dedication, our parents&rsquo; partnership, and,
@@ -371,7 +371,7 @@ export default async function About() {
             </p>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               I warmly invite you to visit our campus, attend an open day, and
-              discover why so many families choose Irshad Academy. Together,
+              discover why so many families choose this school. Together,
               we are building a community of scholars, leaders, and global
               citizens.
             </p>

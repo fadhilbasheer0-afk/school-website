@@ -10,7 +10,7 @@ import {
 import { Button } from "../ui/Button";
 import type { SchoolSettings } from "@/lib/content";
 import type { SchoolPageConfig, TenantContext } from "@/lib/tenant";
-import { getTenantUrl } from "@/lib/tenant";
+import { getTenantUrl } from "@/lib/tenant-url";
 
 interface FooterProps {
   settings?: SchoolSettings;
@@ -19,16 +19,16 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
-  const schoolName = settings?.schoolName || tenant?.name || "IRSHAD";
-  const tagline = settings?.tagline || tenant?.motto || "International Academy";
+  const schoolName = settings?.schoolName || tenant?.name || "School name";
+  const tagline = settings?.tagline || tenant?.motto || "";
   const logoUrl = settings?.logoUrl || tenant?.theme?.logoUrl || null;
   const footerAbout =
     settings?.footerAbout ||
     tenant?.motto ||
-    "Providing a legacy of academic excellence, personal growth, and global citizenship.";
-  const address = settings?.contactAddress || tenant?.address || "125 Academy Road, New York, NY 10024";
-  const phone = settings?.contactPhone || tenant?.phone || "+1 (800) 555-0199";
-  const email = settings?.contactEmail || tenant?.email || "info@irshadacademy.edu";
+    "A customizable website for schools.";
+  const address = settings?.contactAddress || tenant?.address || "";
+  const phone = settings?.contactPhone || tenant?.phone || "";
+  const email = settings?.contactEmail || tenant?.email || "";
   const copyright =
     settings?.footerCopyright ||
     `© ${new Date().getFullYear()} ${schoolName}. All Rights Reserved.`;
@@ -37,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
 
   const tCtx: TenantContext = tenant ?? {
     id: "default",
-    slug: "irshad",
+    slug: "demo-school",
     name: schoolName,
     motto: tagline,
     establishedYear: 1995,
@@ -68,7 +68,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
         .filter((p) => exploreKeys.includes(p.pageKey) && p.isEnabled !== false)
         .map((p) => ({ label: p.title, path: getTenantUrl(tCtx, `/${p.slug}`) }))
     : [
-        { label: "About Our School", path: getTenantUrl(tCtx, "/about") },
+        { label: "About the school", path: getTenantUrl(tCtx, "/about") },
         { label: "Academic Programs", path: getTenantUrl(tCtx, "/academics") },
         { label: "Faculty Directory", path: getTenantUrl(tCtx, "/faculty") },
         { label: "School Facilities", path: getTenantUrl(tCtx, "/facilities") },
@@ -154,7 +154,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
                   color: tenant?.theme?.accentColor || "#d97706",
                 }}
               >
-                {tagline}
+            {tagline}
               </span>
             </div>
           </Link>
@@ -162,7 +162,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
             {footerAbout}
           </p>
           <div className="flex items-center gap-3 pt-2">
-            {socialItems.map((item) => (
+            {socialItems.filter((item) => item.href && item.href !== "#").map((item) => (
               <a
                 key={item.label}
                 href={item.href}
@@ -222,22 +222,22 @@ export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
           <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-1 border-b border-slate-800 pb-2">
             Contact Us
           </h4>
-          <div className="flex items-start gap-2.5 text-xs md:text-sm text-slate-400">
+          {address && <div className="flex items-start gap-2.5 text-xs md:text-sm text-slate-400">
             <MapPin className="w-4 h-4 shrink-0 text-amber-500 mt-0.5" />
             <span>{address}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
+          </div>}
+          {phone && <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
             <Phone className="w-4 h-4 shrink-0 text-amber-500" />
             <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="hover:text-white transition-colors">
               {phone}
             </a>
-          </div>
-          <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
+          </div>}
+          {email && <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
             <Mail className="w-4 h-4 shrink-0 text-amber-500" />
             <a href={`mailto:${email}`} className="hover:text-white transition-colors">
               {email}
             </a>
-          </div>
+          </div>}
         </div>
       </div>
 

@@ -54,18 +54,18 @@ export default async function PlatformDomainsPage() {
     domains = [
       {
         id: "d-1",
-        domain: "irshadacademy.edu",
+        domain: "demo.example.com",
         schoolId: "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d",
-        schoolName: "Irshad Academy",
+        schoolName: "Demo School",
         isPrimary: true,
         isVerified: true,
         createdAt: new Date().toISOString(),
       },
       {
         id: "d-2",
-        domain: "pinecrestprep.org",
+        domain: "sample.example.com",
         schoolId: "8b15e8d9-5c9f-5a1e-8f4d-3a7a7e5b2c6e",
-        schoolName: "Pinecrest Prep Academy",
+        schoolName: "Sample School",
         isPrimary: true,
         isVerified: true,
         createdAt: new Date().toISOString(),

@@ -57,8 +57,8 @@ export const activities: ActivityItem[] = [
     image: "Varsity soccer match on the main pitch",
   },
   {
-    id: "lizard-swim-team",
-    title: "Irshad Lizard Swim Team",
+    id: "swim-team",
+    title: "Swim Team",
     category: "sports",
     description:
       "Our competitive swim squad trains daily at the aquatic center and competes in relay and individual events across the state circuit.",
@@ -78,7 +78,7 @@ export const activities: ActivityItem[] = [
   /* ── Arts ───────────────────────────────────────────────── */
   {
     id: "symphonic-orchestra",
-    title: "Irshad Symphonic Orchestra",
+    title: "Symphonic Orchestra",
     category: "arts",
     description:
       "Open to brass, woodwind, string, and percussion musicians. Weekly rehearsals lead to our winter and spring campus galas.",
@@ -177,7 +177,7 @@ export const activities: ActivityItem[] = [
     title: "National Science Olympiad",
     category: "competitions",
     description:
-      "Irshad teams represented the region across chemistry, physics, and biology divisions of the 2026 National Science Olympiad.",
+      "Student teams represented the region across chemistry, physics, and biology divisions of the 2026 National Science Olympiad.",
     date: "2026",
     image: "Students at the science olympiad competition arena",
   },
@@ -255,7 +255,7 @@ export const activities: ActivityItem[] = [
     title: "AdvancED / Cognia Re-Accreditation",
     category: "school-achievements",
     description:
-      "Irshad earned a full-term re-accreditation from Cognia following a rigorous external review of academics, governance, and facilities.",
+      "The school earned a full-term re-accreditation from Cognia following a rigorous external review of academics, governance, and facilities.",
     date: "2025",
     image: "Accreditation review team on the campus tour",
   },

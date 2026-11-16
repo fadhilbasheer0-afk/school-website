@@ -5,7 +5,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { revalidateContent } from "@/lib/admin/revalidate";
 
-export interface ActionResult<T = unknown> {
+export interface ActionResult<T = any> {
   ok: boolean;
   error?: string;
   data?: T;
@@ -140,7 +140,7 @@ export async function reorderPages(orderedPageIds: string[]): Promise<ActionResu
 /**
  * Creates a new custom page for an institution.
  */
-export async function createCustomPage(formData: FormData): Promise<ActionResult> {
+export async function createCustomPage(formData: FormData): Promise<ActionResult<{ id: string }>> {
   const session = await requireAdmin();
   const schoolId = session.schoolId;
   if (!schoolId && !session.isPlatformAdmin) return fail("No school attached to this account.");
@@ -157,9 +157,10 @@ export async function createCustomPage(formData: FormData): Promise<ActionResult
   if (!title || !slug) return fail("Title and URL slug are required.");
 
   if (!isSupabaseConfigured) {
+    const id = `cp-${Date.now()}`;
     revalidatePath("/admin/custom-pages");
     revalidateContent("custom_pages");
-    return { ok: true };
+    return { ok: true, data: { id } };
   }
 
   const supabase = await createClient();

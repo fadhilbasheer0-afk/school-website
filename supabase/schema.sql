@@ -1,5 +1,5 @@
 -- =============================================================================
--- Irshad Academy — Supabase Schema
+-- Multi-tenant school platform — Supabase schema
 -- =============================================================================
 -- Run this script in the Supabase SQL Editor (Dashboard → SQL → New query).
 -- It creates every table, constraint, index, trigger and Row Level Security
@@ -1059,34 +1059,33 @@ alter table public.contact_information
 -- ---------------------------------------------------------------------------
 insert into public.schools (slug, name, motto, established_year, address, phone, email, website, is_default)
 values (
-  'irshad',
-  'Irshad International Academy',
-  'Legacy of Academic Excellence',
-  1995,
-  '125 Academy Road, New York, NY 10024',
-  '+1 (800) 555-0199',
-  'info@irshadacademy.edu',
-  'https://www.irshadacademy.edu',
+  'demo-school',
+  'Demo School',
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
   true
 )
 on conflict (slug) do nothing;
 
 update public.schools
 set is_default = true
-where slug = 'irshad';
+where slug = 'demo-school';
 
 insert into public.school_settings (
   school_id, school_name, tagline, contact_email, contact_phone, contact_address,
   website_url, map_url, coordinates, footer_about, footer_copyright
 )
 select
-  id, name, motto, email, phone, address,
-  website, 'https://www.google.com/maps?q=125%20Academy%20Road%2C%20New%20York%2C%20NY%2010024&output=embed',
-  '40.7128, -74.0060',
-  'Irshad International Academy provides a legacy of academic excellence, personal growth, and global citizenship.',
-  '© Irshad International Academy. All rights reserved.'
+  id, 'Demo School', null, null, null, null,
+  null, null, null,
+  'School website powered by a customizable platform.',
+  '© Demo School. All rights reserved.'
 from public.schools
-where slug = 'irshad'
+where slug = 'demo-school'
 on conflict (school_id) do nothing;
 
 -- ---------------------------------------------------------------------------
@@ -1098,17 +1097,17 @@ on conflict (school_id) do nothing;
 
 insert into public.home_hero_slides (school_id, title, subtitle, image_url, cta_label, cta_url, sort_order, is_active)
 select s.id, v.title, v.subtitle, v.image, v.cta_label, v.cta_url, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Nurturing Minds, Inspiring Futures', 'Academic rigour, character development, and global citizenship — in one community.', null::text, 'Apply Now', '/admissions', 1),
   ('A Campus Built for Discovery', 'Purpose-built science labs, an Olympic aquatic centre, and a digital library.', null::text, 'Explore Campus', '/facilities', 2),
-  ('Welcome to Irshad Academy', 'A legacy of excellence since 1995, serving 1,200+ students from 35 nationalities.', null::text, 'About Us', '/about', 3)
+  ('Welcome', 'A welcoming learning community with opportunities to learn, grow, and participate.', null::text, 'About Us', '/about', 3)
 ) as v(title, subtitle, image, cta_label, cta_url, sort_order)
 where not exists (select 1 from public.home_hero_slides h where h.school_id = s.id);
 
 insert into public.home_statistics (school_id, label, value, sort_order, is_active)
 select s.id, v.label, v.value, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Years of Excellence', '25+', 1),
   ('Students Enrolled', '1,200+', 2),
@@ -1121,9 +1120,9 @@ where not exists (select 1 from public.home_statistics st where st.school_id = s
 
 insert into public.announcements (school_id, title, slug, category, summary, content, author, published_at, is_featured, is_published)
 select s.id, v.title, v.slug, v.category, v.summary, v.summary, 'Office of Communications', now() - (v.days_ago || ' days')::interval, true, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('Irshad Seniors Achieve Top Ranks in National Merit Scholarship', 'national-merit-scholarship', 'Academic', 'Fifteen graduating seniors named semi-finalists in the 2026 National Merit Scholarship program.', 'Fifteen of our graduating seniors have been named semi-finalists in the 2026 National Merit Scholarship program, placing them in the top 1% nationwide.', 3),
+  ('Students Achieve Top Ranks in National Merit Scholarship', 'national-merit-scholarship', 'Academic', 'Fifteen graduating seniors named semi-finalists in the 2026 National Merit Scholarship program.', 'Fifteen of our graduating seniors have been named semi-finalists in the 2026 National Merit Scholarship program, placing them in the top 1% nationwide.', 3),
   ('Annual Campus Science & Tech Fair — Registration Opens', 'science-tech-fair-2026', 'Science & STEM', 'Individual and team projects in environmental engineering, robotics, and software development are welcome.', 'Individual and team projects in environmental engineering, robotics, and software development are welcome. Grand prizes include college-level lab sponsorships.', 6),
   ('Eco-Ambassadors Launch Campus Biodiversity Audit', 'biodiversity-audit', 'Community', 'Our student-led environmental club begins a semester-long survey of native flora and fauna.', 'Our student-led environmental club begins a semester-long survey of native flora and fauna to inform sustainable landscaping policies.', 9)
 ) as v(title, slug, category, summary, content, days_ago)
@@ -1131,7 +1130,7 @@ where not exists (select 1 from public.announcements a where a.school_id = s.id)
 
 insert into public.events (school_id, title, slug, category, description, start_date, start_time, end_time, venue, is_featured, is_published)
 select s.id, v.title, v.slug, v.category, v.description, v.start_date, v.start_time, v.end_time, v.venue, true, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Parent–Teacher Orientation Seminar', 'parent-teacher-orientation-seminar', 'Community', 'Meet your child''s teachers and learn about the year ahead.', date '2026-08-12', time '09:00', time '12:00', 'Main Auditorium'),
   ('Annual Inter-School Sports Gala', 'annual-inter-school-sports-gala', 'Sports', 'A full day of inter-school competition across 12 sports.', date '2026-08-25', time '08:00', time '16:00', 'Sports Complex'),
@@ -1141,7 +1140,7 @@ where not exists (select 1 from public.events e where e.school_id = s.id);
 
 insert into public.facilities (school_id, name, slug, description, features, sort_order, is_active)
 select s.id, v.name, v.slug, v.description, v.features::jsonb, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('STEM & Robotics Lab', 'stem-robotics-lab', '3D printers, Arduino stations, and automated workspace benches for hands-on engineering projects.', '["3D printers", "Arduino stations", "Automated benches", "Robotics kits"]', 1),
   ('Digital Library & Media Center', 'digital-library-media-center', 'Over 32,000 volumes plus high-speed computer terminals, private study cabins, and media collaboration spaces.', '["32,000+ volumes", "Research terminals", "Study cabins", "Media studios"]', 2),
@@ -1152,7 +1151,7 @@ where not exists (select 1 from public.facilities f where f.school_id = s.id);
 
 insert into public.teachers (school_id, name, title, bio, qualifications, department_id, sort_order, is_active)
 select s.id, v.name, v.title, v.bio, v.qualifications, d.id, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Dr. Margaret A. Whitfield', 'Principal & Head of School', 'Educational leader focused on holistic, rigorous international education.', 'Ed.D. Educational Leadership — Columbia University', 'Leadership', 1),
   ('Mr. Jonathan K. Park', 'Head of Mathematics', 'Leads our mathematics programme from foundation to AP/IB level.', 'M.Sc. Applied Mathematics', 'Mathematics', 2),
@@ -1164,16 +1163,16 @@ where not exists (select 1 from public.teachers t where t.school_id = s.id);
 
 insert into public.gallery_albums (school_id, title, slug, description, sort_order, is_active)
 select s.id, v.title, v.slug, v.description, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('Campus Life', 'campus-life', 'Everyday moments around the Irshad campus.', 1),
+  ('Campus Life', 'campus-life', 'Everyday moments around campus.', 1),
   ('Graduation Ceremony', 'graduation-ceremony', 'Highlights from this year''s graduation.', 2)
 ) as v(title, slug, description, sort_order)
 where not exists (select 1 from public.gallery_albums g where g.school_id = s.id);
 
 insert into public.gallery_photos (school_id, album_id, title, description, image_url, alt_text, sort_order, is_active)
 select s.id, a.id, v.title, v.title, null, v.title, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('campus-life', 'Students in Science Lab', 1),
   ('campus-life', 'Football Match on Main Pitch', 2),
@@ -1185,7 +1184,7 @@ where not exists (select 1 from public.gallery_photos p where p.school_id = s.id
 
 insert into public.activities (school_id, name, slug, category, description, sort_order, is_active)
 select s.id, v.name, v.slug, v.category, v.description, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Robotics Club', 'robotics-club', 'clubs', 'Design, build, and program robots for national competitions.', 1),
   ('Symphony Orchestra', 'symphony-orchestra', 'arts', 'Weekly rehearsals and two public concerts each term.', 2),
@@ -1196,7 +1195,7 @@ where not exists (select 1 from public.activities a where a.school_id = s.id);
 
 insert into public.achievements (school_id, title, category, description, achieved_at, sort_order, is_active)
 select s.id, v.title, v.category, v.description, v.achieved_at, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('National Science Olympiad — Gold Medal', 'Academic', 'Grade 11 students secured first place in the chemistry and physics divisions at the 2026 National Science Olympiad.', date '2026-05-15', 1),
   ('IB Diploma — 98% Pass Rate', 'Academic', 'Our 2025 graduating class achieved a 98% pass rate in the IB Diploma Programme.', date '2025-07-10', 2),
@@ -1206,10 +1205,10 @@ where not exists (select 1 from public.achievements a where a.school_id = s.id);
 
 insert into public.about_content (school_id, section_key, title, body, sort_order, is_active)
 select s.id, v.section_key, v.title, v.body, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('intro', 'About Irshad Academy', 'Founded in 1995, Irshad Academy grew from a single classroom building to a state-of-the-art 20-acre campus serving more than 1,200 students representing 35 nationalities. Our alumni attend leading universities across six continents.', 1),
-  ('mission', 'Our Mission', 'Irshad International Academy is committed to providing a rigorous, inclusive, and nurturing education that equips students with the knowledge, skills, and character to thrive in an ever-changing world.', 2),
+  ('intro', 'About the School', 'A welcoming learning community focused on academic growth, personal development, and preparing students for the future.', 1),
+  ('mission', 'Our Mission', 'The school is committed to providing a rigorous, inclusive, and nurturing education that equips students with the knowledge, skills, and character to thrive in an ever-changing world.', 2),
   ('vision', 'Our Vision', 'To be a globally recognized centre of educational excellence that develops principled, creative, and compassionate leaders who shape the future of their communities and the world.', 3),
   ('values', 'Our Core Values', 'We are guided by the pursuit of excellence, integrity and respect, innovation in learning, compassion and service, global awareness, and lifelong curiosity.', 4),
   ('leadership', 'School Management & Governance', 'The Board of Governors and senior leadership team ensure strategic direction, financial integrity, and educational quality.', 5)
@@ -1218,20 +1217,20 @@ where not exists (select 1 from public.about_content c where c.school_id = s.id)
 
 insert into public.about_milestones (school_id, year, title, description, sort_order, is_active)
 select s.id, v.year, v.title, v.description, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('1995', 'Foundation Laid', 'Irshad Academy opens its doors with 60 students in a single classroom building.', 1),
+  ('', 'A Place to Learn', 'The school opens its doors to students and families.', 1),
   ('2001', 'First Campus Expansion', 'New science laboratories and a 400-seat auditorium are completed.', 2),
-  ('2008', 'IB Programme Authorised', 'Irshad becomes an authorised International Baccalaureate World School.', 3),
+  ('', 'Learning Pathways Expanded', 'New learning pathways give students more ways to explore their interests.', 3),
   ('2014', 'Olympic Aquatic Centre', 'A 10-lane semi-olympic pool opens, cementing our aquatic sports programme.', 4),
   ('2019', 'Digital Learning Hub', 'A campus-wide 1:1 device programme and digital library launch.', 5),
-  ('2024', '1,200 Students Strong', 'The school community grows to more than 1,200 students from 35 nationalities.', 6)
+  ('', 'A Growing Community', 'Students, staff, and families continue to shape the school community.', 6)
 ) as v(year, title, description, sort_order)
 where not exists (select 1 from public.about_milestones m where m.school_id = s.id);
 
 insert into public.about_management (school_id, name, role, bio, sort_order, is_active)
 select s.id, v.name, v.role, v.bio, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Dr. Margaret A. Whitfield', 'Principal & Head of School', 'Educational leader focused on holistic, rigorous international education.', 1),
   ('Mr. Jonathan K. Park', 'Deputy Head — Academics', 'Oversees the curriculum and faculty development across all programmes.', 2),
@@ -1242,7 +1241,7 @@ where not exists (select 1 from public.about_management mg where mg.school_id = 
 
 insert into public.academic_classes (school_id, level, grade_label, age_range, description, subjects, sort_order, is_active)
 select s.id, v.level, v.grade_label, v.age_range, v.description, v.subjects::jsonb, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Primary', 'Grades 1 – 5', 'Ages 6 – 11', 'The Primary Years Programme builds a strong foundation in literacy, numeracy, and scientific inquiry.', '["English", "Mathematics", "Science", "Humanities", "World Languages", "Arts", "Physical Education"]', 1),
   ('Middle', 'Grades 6 – 8', 'Ages 11 – 14', 'Students are introduced to laboratory sciences, world languages, coding, and structured research projects.', '["English", "Mathematics", "Sciences", "Humanities", "World Languages", "Coding", "Design & Technology"]', 2),
@@ -1252,7 +1251,7 @@ where not exists (select 1 from public.academic_classes c where c.school_id = s.
 
 insert into public.academic_departments (school_id, name, slug, description, sort_order, is_active)
 select s.id, v.name, v.slug, v.description, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Leadership', 'leadership', 'Executive and senior leadership overseeing school strategy and educational quality.', 1),
   ('Mathematics', 'mathematics', 'From foundational arithmetic to AP Calculus and IB Mathematics.', 2),
@@ -1264,7 +1263,7 @@ where not exists (select 1 from public.academic_departments d where d.school_id 
 
 insert into public.academic_content (school_id, slug, title, summary, body, sort_order, is_active)
 select s.id, v.slug, v.title, v.summary, v.body, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('ib-diploma', 'International Baccalaureate Diploma', 'A globally respected pre-university programme emphasising critical thinking and inquiry.', 'Two-year programme across six subject groups plus the Core: Theory of Knowledge, the Extended Essay, and Creativity, Activity, Service (CAS).', 1),
   ('cambridge-igcse', 'Cambridge IGCSE', 'Flexible, rigorous qualifications recognised by universities worldwide.', 'A broad foundation in core disciplines with the freedom to specialise through optional subjects in languages, sciences, and the humanities.', 2),
@@ -1274,7 +1273,7 @@ where not exists (select 1 from public.academic_content c where c.school_id = s.
 
 insert into public.academic_calendar (school_id, title, description, start_date, end_date, sort_order, is_active)
 select s.id, v.title, v.description, v.start_date, v.end_date, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Term 1 — Autumn', 'August 18 – December 12, 2026', date '2026-08-18', date '2026-12-12', 1),
   ('Term 2 — Spring', 'January 05 – April 10, 2027', date '2027-01-05', date '2027-04-10', 2),
@@ -1284,7 +1283,7 @@ where not exists (select 1 from public.academic_calendar c where c.school_id = s
 
 insert into public.documents (school_id, title, description, file_url, category, sort_order, is_active)
 select s.id, v.title, v.description, v.file_url, v.category, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('School Prospectus 2026–27', 'A comprehensive overview of programmes, facilities, admissions, and fees.', null::text, 'Prospectus', 1),
   ('IB Diploma Programme Guide', 'Detailed information on IB subject groups, core requirements, and university recognition.', null::text, 'Academics', 2),
@@ -1294,7 +1293,7 @@ where not exists (select 1 from public.documents d where d.school_id = s.id);
 
 insert into public.admissions (school_id, section_key, title, body, sort_order, is_active)
 select s.id, v.section_key, v.title, v.body, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('overview', 'Admissions Overview', 'We welcome applications from families seeking a rigorous international education for their children.', 1),
   ('eligibility', 'Eligibility', 'Children are eligible from age 3 (Early Years) through Grade 12. No prior entrance exam is required for Early Years.', 2),
@@ -1307,7 +1306,7 @@ where not exists (select 1 from public.admissions a where a.school_id = s.id);
 
 insert into public.admission_fees (school_id, level, amount, description, sort_order, is_active)
 select s.id, v.level, v.amount, v.description, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('Early Years', '$2,900', 'Per academic term', 1),
   ('Primary', '$3,400', 'Per academic term', 2),
@@ -1318,18 +1317,18 @@ where not exists (select 1 from public.admission_fees f where f.school_id = s.id
 
 insert into public.home_content (school_id, section_key, title, subtitle, body, cta_label, cta_url, sort_order, is_active)
 select s.id, v.section_key, v.title, v.subtitle, v.body, v.cta_label, v.cta_url, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('intro', 'Welcome to Irshad', 'A Legacy of Excellence Since 1995', 'For over twenty-five years, Irshad International Academy has set the standard for holistic education. Our rigorous academic programs, combined with a wide range of co-curricular activities, develop confident, caring, and creative young people who are prepared to succeed in an ever-changing world.', 'Learn More About Us', '/about', 1),
-  ('principal', 'Principal''s Desk', 'A Message from Our Principal', 'At Irshad, we believe that every child is capable of extraordinary things. Our role as educators is not merely to impart knowledge, but to ignite a passion for lifelong learning. We cultivate an environment where curiosity is encouraged, creativity is celebrated, and character is paramount.', 'Schedule a Campus Visit', '/contact', 2),
-  ('featured', 'Our Pillars', 'The Irshad Approach', 'We provide a balanced education focused on intellectual growth, physical development, and ethical leadership.', null, null, 3),
-  ('admissions-cta', 'Begin Your Child''s Journey at Irshad', 'Applications open', 'Applications for the 2026–27 academic year are now open. Schedule a campus visit, speak with our admissions counsellors, or submit an inquiry online. We look forward to welcoming your family to the Irshad community.', 'Start Your Application', '/admissions', 4)
+  ('intro', 'Welcome', 'Learning, growth, and community', 'Explore learning programs, student activities, and the people who make up this school community.', 'Learn More About Us', '/about', 1),
+  ('principal', 'Principal''s Desk', 'A Message from Our Principal', 'At the school, we believe that every child is capable of extraordinary things. Our role as educators is not merely to impart knowledge, but to ignite a passion for lifelong learning. We cultivate an environment where curiosity is encouraged, creativity is celebrated, and character is paramount.', 'Schedule a Campus Visit', '/contact', 2),
+  ('featured', 'Our Approach', 'Learning through experience', 'A balanced education supports intellectual growth, physical development, and personal responsibility.', null, null, 3),
+  ('admissions-cta', 'Explore Enrollment', 'Learn about admissions', 'Review enrollment information, speak with the school team, or send an inquiry to get started.', 'View Admissions', '/admissions', 4)
 ) as v(section_key, title, subtitle, body, cta_label, cta_url, sort_order)
 where not exists (select 1 from public.home_content h where h.school_id = s.id);
 
 insert into public.nav_items (school_id, section, label, href, sort_order, is_active)
 select s.id, v.section, v.label, v.href, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
   ('main', 'Home', '/', 1),
   ('main', 'About Us', '/about', 2),
@@ -1353,11 +1352,8 @@ where not exists (select 1 from public.nav_items n where n.school_id = s.id);
 
 insert into public.contact_information (school_id, label, type, value, is_primary, sort_order, is_active)
 select s.id, v.label, v.type, v.value, v.is_primary, v.sort_order, true
-from (select id from public.schools where slug = 'irshad') s
+from (select id from public.schools where slug = 'demo-school') s
 cross join (values
-  ('School Address', 'address', '125 Academy Road, New York, NY 10024', true, 1),
-  ('Phone', 'phone', '+1 (800) 555-0199', true, 2),
-  ('Email', 'email', 'info@irshadacademy.edu', true, 3),
   ('Office Hours', 'hours', 'Mon – Fri, 8:00 AM – 5:00 PM', false, 4)
 ) as v(label, type, value, is_primary, sort_order)
 where not exists (select 1 from public.contact_information c where c.school_id = s.id);

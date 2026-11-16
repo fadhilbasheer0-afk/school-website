@@ -52,7 +52,7 @@ const staticAnnouncements = [
   {
     tag: "Academic",
     tagColor: "text-indigo-600 dark:text-indigo-400",
-    title: "Irshad Seniors Achieve Top Ranks in National Merit Scholarship",
+    title: "Students Achieve Top Ranks in National Merit Scholarship",
     excerpt:
       "Fifteen of our graduating seniors have been named semi-finalists in the 2026 National Merit Scholarship program, placing them in the top 1% nationwide.",
     date: "Aug 05, 2026",
@@ -119,7 +119,7 @@ const staticAchievements = [
     icon: <Star className="w-6 h-6 text-emerald-500" />,
     title: "State Swimming Championship — 5 Gold Medals",
     description:
-      "The Irshad Lizards swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
+      "The school swim team won five individual gold medals and a team relay silver at the 2026 State Interschool Championships.",
   },
 ];
 
@@ -153,7 +153,7 @@ const staticFacilities = [
 const staticHero = {
   title: "Nurturing Minds, Inspiring Futures",
   subtitle:
-    "Welcome to Irshad Academy — where academic rigour, character development, and global citizenship come together. We empower every student to excel, lead, and make a difference.",
+    "A welcoming learning community where academic growth, character development, and global citizenship come together.",
   imageUrl: null as string | null,
   ctaLabel: "Apply Now",
   ctaUrl: "/admissions",
@@ -440,7 +440,7 @@ export default async function Home() {
                 Welcome to {tenant.name}
               </span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
-                A Legacy of Academic Excellence
+                Learning and Growth
               </h2>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                 At {tenant.name}, we set the standard for holistic education. Our rigorous academic
@@ -913,13 +913,6 @@ export default async function Home() {
         </div>
       </section>
       )}
-              >
-                Contact Admissions
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

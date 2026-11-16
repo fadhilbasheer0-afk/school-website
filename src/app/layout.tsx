@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await resolveTenant();
-  const siteUrl = tenant.website || "https://www.irshadacademy.edu";
+  const siteUrl = tenant.website || "https://example.edu";
 
   return {
     metadataBase: new URL(siteUrl),

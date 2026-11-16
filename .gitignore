@@ -38,6 +38,11 @@ dev-server.log
 # vercel
 .vercel
 
+# Supabase CLI cache
+/supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

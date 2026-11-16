@@ -2,39 +2,28 @@
  * Central site configuration shared across pages, SEO metadata, sitemap and
  * robots. Update these values when the CMS / production domain is connected.
  */
+type SiteSocialLinks = Partial<Record<"facebook" | "twitter" | "instagram" | "linkedin" | "youtube", string>>;
+
 export const siteConfig = {
-  name: "Irshad Academy",
-  legalName: "Irshad International Academy",
-  url: "https://www.irshadacademy.edu",
-  description:
-    "Irshad International Academy provides a legacy of academic excellence, personal growth, and global citizenship. Empowering students since 1995.",
+  name: "Demo School",
+  legalName: "Demo School",
+  url: "https://example.edu",
+  description: "A school website powered by a customizable multi-tenant platform.",
   locale: "en_US",
-  email: "info@irshadacademy.edu",
-  principalEmail: "principal@irshadacademy.edu",
-  admissionsEmail: "admissions@irshadacademy.edu",
-  phoneMain: "+1 (800) 555-0190",
-  phoneAdmissions: "+1 (800) 555-0199",
+  email: "",
+  principalEmail: "",
+  admissionsEmail: "",
+  phoneMain: "",
+  phoneAdmissions: "",
   address: {
-    street: "125 Academy Road",
-    city: "New York, NY 10024",
-    gps: "40.7128° N, 74.0060° W",
-    mapEmbedUrl:
-      "https://www.google.com/maps?q=125%20Academy%20Road%2C%20New%20York%2C%20NY%2010024&output=embed",
-    mapLinkUrl:
-      "https://www.google.com/maps/search/?api=1&query=125+Academy+Road%2C+New+York%2C+NY+10024",
+    street: "",
+    city: "",
+    gps: "",
+    mapEmbedUrl: "",
+    mapLinkUrl: "",
   },
-  officeHours: [
-    { label: "Monday – Friday", value: "08:00 AM – 04:30 PM" },
-    { label: "Saturday", value: "09:00 AM – 12:00 PM (Admissions only)" },
-    { label: "Sunday & Holidays", value: "Closed" },
-  ],
-  social: {
-    facebook: "https://www.facebook.com/irshadacademy",
-    twitter: "https://www.twitter.com/irshadacademy",
-    instagram: "https://www.instagram.com/irshadacademy",
-    linkedin: "https://www.linkedin.com/school/irshadacademy",
-    youtube: "https://www.youtube.com/@irshadacademy",
-  },
+  officeHours: [] as { label: string; value: string }[],
+  social: {} as SiteSocialLinks,
 };
 
 /** Static top-level routes included in the sitemap. */

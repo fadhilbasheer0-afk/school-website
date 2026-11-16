@@ -7,7 +7,7 @@ import { Menu, X, Phone, Mail, GraduationCap, ChevronRight } from "lucide-react"
 import { Button } from "../ui/Button";
 import type { SchoolSettings } from "@/lib/content";
 import type { SchoolPageConfig, CustomPage, TenantContext } from "@/lib/tenant";
-import { getTenantUrl } from "@/lib/tenant";
+import { getTenantUrl } from "@/lib/tenant-url";
 
 interface NavLink {
   label: string;
@@ -32,17 +32,17 @@ export const Header: React.FC<HeaderProps> = ({
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
 
-  const schoolName = settings?.schoolName || tenant?.name || "IRSHAD";
-  const tagline = settings?.tagline || tenant?.motto || "International Academy";
+  const schoolName = settings?.schoolName || tenant?.name || "School name";
+  const tagline = settings?.tagline || tenant?.motto || "";
   const logoUrl = settings?.logoUrl || tenant?.theme?.logoUrl || null;
-  const phone = settings?.contactPhone || tenant?.phone || "+1 (800) 555-0199";
-  const email = settings?.contactEmail || tenant?.email || "info@irshadacademy.edu";
+  const phone = settings?.contactPhone || tenant?.phone || "";
+  const email = settings?.contactEmail || tenant?.email || "";
   const year = new Date().getFullYear();
 
   // Dynamic Navigation Generation
   const tCtx: TenantContext = tenant ?? {
     id: "default",
-    slug: "irshad",
+    slug: "demo-school",
     name: schoolName,
     motto: tagline,
     establishedYear: 1995,
@@ -155,20 +155,20 @@ export const Header: React.FC<HeaderProps> = ({
         {!isScrolled && (
           <div className="hidden lg:flex w-full bg-slate-900 text-slate-300 py-2.5 px-8 justify-between border-b border-slate-800 text-xs">
             <div className="flex items-center gap-6">
-              <a
+              {phone && <a
                 href={`tel:${phone.replace(/[^+\d]/g, "")}`}
                 className="flex items-center gap-2 hover:text-amber-400 transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>{phone}</span>
-              </a>
-              <a
+              </a>}
+              {email && <a
                 href={`mailto:${email}`}
                 className="flex items-center gap-2 hover:text-amber-400 transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />
                 <span>{email}</span>
-              </a>
+              </a>}
             </div>
             <div className="flex items-center gap-6 font-medium">
               {quickNavLinks.map((link) => (

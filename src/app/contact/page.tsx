@@ -13,14 +13,14 @@ import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Get in touch with Irshad Academy. Find our school address, phone numbers, emails, office hours, campus map, and social media — or send us a message.",
+    "Get in touch with the school. Find our school address, phone numbers, emails, office hours, campus map, and social media — or send us a message.",
   alternates: {
     canonical: `${siteConfig.url}/contact`,
   },
   openGraph: {
-    title: "Contact Us | Irshad Academy",
+    title: "Contact Us",
     description:
-      "Reach Irshad Academy by phone, email, or visit our campus. Explore our contact details, office hours, and location map.",
+      "Reach the school by phone, email, or visit our campus. Explore our contact details, office hours, and location map.",
     url: `${siteConfig.url}/contact`,
     type: "website",
   },
@@ -43,7 +43,7 @@ export default async function Contact() {
   const addressValue =
     settings.contactAddress ||
     addressEntry?.value ||
-    `${siteConfig.address.street}, ${siteConfig.address.city}`;
+    [siteConfig.address.street, siteConfig.address.city].filter(Boolean).join(", ");
   const phoneMain =
     settings.contactPhone || phoneEntries[0]?.value || siteConfig.phoneMain;
   const phoneAdmissions =
@@ -59,6 +59,7 @@ export default async function Contact() {
 
   const contactCards = [
     {
+      visible: Boolean(addressValue),
       icon: <MapPin className="w-5 h-5" />,
       title: "School Address",
       accent:
@@ -70,6 +71,7 @@ export default async function Contact() {
       ),
     },
     {
+      visible: Boolean(phoneMain || phoneAdmissions),
       icon: <Phone className="w-5 h-5" />,
       title: "Phone Numbers",
       accent:
@@ -98,6 +100,7 @@ export default async function Contact() {
       ),
     },
     {
+      visible: Boolean(emailGeneral || emailPrincipal),
       icon: <Mail className="w-5 h-5" />,
       title: "Emails",
       accent:
@@ -126,6 +129,7 @@ export default async function Contact() {
       ),
     },
     {
+      visible: officeHours.length > 0,
       icon: <Clock className="w-5 h-5" />,
       title: "Office Hours",
       accent:
@@ -162,12 +166,12 @@ export default async function Contact() {
         />
 
         {/* Contact information cards */}
-        <section aria-labelledby="contact-cards-heading" className="mb-16">
+        {contactCards.some((card) => card.visible) && <section aria-labelledby="contact-cards-heading" className="mb-16">
           <h2 id="contact-cards-heading" className="sr-only">
             Contact information
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {contactCards.map((card) => (
+            {contactCards.filter((card) => card.visible).map((card) => (
               <div
                 key={card.title}
                 className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
@@ -180,31 +184,31 @@ export default async function Contact() {
               </div>
             ))}
           </div>
-        </section>
+        </section>}
 
-        {/* Form and Direct Contact grid */}
+        {/* Contact form and optional direct contact details */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start my-16">
           {/* Left Column: Quick info + social */}
           <aside className="lg:col-span-5 flex flex-col gap-8 text-left order-2 lg:order-1">
-            <div>
+            {Object.values(settings.socialLinks ?? {}).some(Boolean) && <div>
               <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
                 Campus Directory
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-light mb-6">
-                Irshad Academy welcomes visitors, parents, and community members. Reach the department you need directly — or follow us on social media for daily campus life.
+                The school welcomes visitors, parents, and community members. Reach the department you need directly — or follow us on social media for daily campus life.
               </p>
-            </div>
+            </div>}
 
             {/* Social media */}
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">
                 Follow Us Online
               </h2>
-              <SocialLinks iconClassName="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:text-amber-500 text-slate-500 dark:text-slate-400 transition-all duration-300 flex items-center justify-center" />
+              <SocialLinks links={settings.socialLinks} iconClassName="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:text-amber-500 text-slate-500 dark:text-slate-400 transition-all duration-300 flex items-center justify-center" />
             </div>
 
             {/* Campus map quick link */}
-            <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5">
+            {siteConfig.address.mapLinkUrl && <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                   <Navigation className="w-5 h-5" />
@@ -225,7 +229,7 @@ export default async function Contact() {
                 Open in Google Maps
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
-            </div>
+            </div>}
           </aside>
 
           {/* Right Column: Contact form */}
@@ -234,7 +238,8 @@ export default async function Contact() {
           </div>
         </div>
 
-        {/* Google Maps section */}
+        {/* A map appears only after a tenant supplies its own location. */}
+        {siteConfig.address.mapEmbedUrl && (
         <section aria-labelledby="map-heading" className="my-16">
           <div className="text-center mb-8">
             <h2 id="map-heading" className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -246,7 +251,7 @@ export default async function Contact() {
           </div>
           <div className="rounded-3xl overflow-hidden border border-slate-200/60 dark:border-slate-800/80 shadow-xl shadow-slate-100/50 dark:shadow-none">
             <iframe
-              title="Google Map showing the Irshad Academy campus at 125 Academy Road, New York, NY 10024"
+              title="Map showing the school location"
               src={siteConfig.address.mapEmbedUrl}
               width="100%"
               height="480"
@@ -269,6 +274,7 @@ export default async function Contact() {
             </Link>
           </p>
         </section>
+        )}
       </div>
     </div>
   );

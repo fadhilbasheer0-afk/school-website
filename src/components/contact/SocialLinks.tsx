@@ -28,7 +28,7 @@ export const SocialLinks: React.FC<SocialLinksProps> = ({
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {items.map((link) => (
+      {items.filter((link) => Boolean(link.href)).map((link) => (
         <a
           key={link.label}
           href={link.href}

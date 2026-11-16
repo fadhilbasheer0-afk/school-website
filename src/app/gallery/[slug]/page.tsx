@@ -22,11 +22,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const detail = await getGalleryAlbumBySlug(slug);
   if (!detail) {
-    return { title: "Album Not Found | Irshad Academy" };
+    return { title: "Album Not Found" };
   }
   return {
     title: `${detail.album.title} | Campus Gallery`,
-    description: detail.album.description || `Photo album from Irshad Academy.`,
+    description: detail.album.description || "Photo album",
   };
 }
 

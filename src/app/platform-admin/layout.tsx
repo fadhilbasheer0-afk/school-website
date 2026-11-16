@@ -16,7 +16,7 @@ import { AdminSignOutButton } from "@/components/admin/AdminSignOutButton";
 import { ToastProvider } from "@/components/admin/ui";
 
 export const metadata: Metadata = {
-  title: "Super Admin | EduSaaS Platform",
+  title: "Super Admin | School Platform",
   robots: { index: false, follow: false },
 };
 
@@ -51,7 +51,7 @@ export default async function PlatformAdminLayout({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base text-white tracking-tight">
-                  EduSaaS Platform
+                  School Platform
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
                   Super Admin

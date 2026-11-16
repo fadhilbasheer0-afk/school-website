@@ -33,7 +33,7 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
     if (process.env.NODE_ENV === "development" && process.env.ENABLE_DEV_ADMIN === "true") {
       return {
         userId: "dev-super-admin-id",
-        email: "superadmin@edusaas.com",
+        email: "superadmin@example.com",
         fullName: "Platform Super Admin (Dev)",
         role: "owner",
         schoolId: "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d",

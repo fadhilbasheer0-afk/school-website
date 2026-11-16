@@ -85,7 +85,7 @@ export const AdminLoginForm: React.FC<AdminLoginFormProps> = ({ next }) => {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@irshadacademy.edu"
+            placeholder="you@example.edu"
             required
           />
         </FormField>

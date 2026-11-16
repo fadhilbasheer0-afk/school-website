@@ -5,7 +5,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { requirePlatformAdmin } from "@/lib/supabase/auth";
 import { MOCK_TENANTS } from "@/lib/tenant";
 
-export interface ActionResult<T = unknown> {
+export interface ActionResult<T = any> {
   ok: boolean;
   error?: string;
   data?: T;
@@ -42,7 +42,7 @@ async function logAudit(
 /**
  * Creates a brand new institution with default theme, pages, sections, and subscription.
  */
-export async function createSchool(formData: FormData): Promise<ActionResult> {
+export async function createSchool(formData: FormData): Promise<ActionResult<{ id: string }>> {
   const session = await requirePlatformAdmin();
 
   const name = String(formData.get("name") ?? "").trim();
@@ -65,8 +65,9 @@ export async function createSchool(formData: FormData): Promise<ActionResult> {
 
   if (!isSupabaseConfigured) {
     // Development mock
+    const id = `mock-${slug}-${Date.now()}`;
     MOCK_TENANTS[slug] = {
-      id: `mock-${slug}-${Date.now()}`,
+      id,
       slug,
       name,
       motto: motto || null,
@@ -88,7 +89,7 @@ export async function createSchool(formData: FormData): Promise<ActionResult> {
       },
     };
     revalidatePath("/platform-admin");
-    return { ok: true };
+    return { ok: true, data: { id } };
   }
 
   const supabase = await createClient();

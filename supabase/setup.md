@@ -1,6 +1,6 @@
 # Supabase Setup Guide
 
-This guide walks through connecting the Irshad Academy site to Supabase.
+This guide walks through connecting the school website platform to Supabase.
 The project includes a complete SQL schema (`schema.sql`) and the auth
 infrastructure for the `/admin` area. No code is written in this guide — you
 only point Supabase at your project and run the schema.
@@ -44,15 +44,20 @@ only point Supabase at your project and run the schema.
 2. Paste the entire contents of `supabase/schema.sql`.
 3. Click **Run**.
 
-The script creates every table, index, trigger, Row Level Security (RLS)
-policy, the `school-media` and `school-assets` storage buckets, and a seed
-school. It is safe to re-run.
+The schema creates the core tables, indexes, triggers, Row Level Security
+(RLS) policies, storage buckets, and neutral starter content. For a new
+project, then run these SQL files in order:
 
-> **Upgrading a database that still contains the old "Pinecrest" seed?** Run
-> `supabase/migrations/20260812_rebrand_pinecrest_to_irshad.sql` after the
-> schema. It renames the school row and rewrites branding inside every CMS
-> table in place (no data loss, safe to re-run). See the migration file header
-> for details.
+1. `supabase/migrations/20261116_multi_tenant_saas.sql`
+2. `supabase/migrations/20261116190000_neutral_platform_defaults.sql`
+
+Skip the older August rebrand migration for a new project. For an existing
+database, apply only migrations that have not already been run; do not rerun
+the full schema.
+
+> The migration `20260812_rebrand_pinecrest_to_irshad.sql` is retained for
+> databases created by an earlier version. Do not rerun historical migrations
+> as part of a fresh setup; use `schema.sql` for a new database.
 
 ## 4. Enable email authentication
 
@@ -62,25 +67,12 @@ school. It is safe to re-run.
    **Site URL** to your app origin so password-reset links point to the right
    place.
 
-## 5. Create the first admin
+## 5. Create the platform super admin
 
-The schema auto-creates a `profiles` row (role `viewer`) whenever a new user
-signs up through Supabase Auth.
-
-To create your first admin:
-
-1. **Authentication → Users → Add user** with the email/password you want for
-   the admin account. This creates the `auth.users` row and the matching
-   `profiles` row.
-2. Promote that user in the **SQL Editor** (the table owner bypasses RLS):
-
-   ```sql
-   update public.profiles
-   set role = 'admin'
-   where email = 'you@example.com';
-   ```
-
-3. Sign in at `/admin/login` with those credentials.
+1. In **Authentication → Users**, add `fadhilbasheer0@gmail.com`.
+2. Run `supabase/bootstrap_super_admin.sql` in the SQL editor. It grants the
+   account the platform owner role and adds it to `platform_admins`.
+3. Sign in at `/admin/login`; the account can then open `/platform-admin`.
 
 > Security model: only an existing admin can change roles (see
 > `prevent_self_role_escalation`), and the app redirects non-admin roles to
@@ -89,8 +81,9 @@ To create your first admin:
 ## 6. Verify
 
 - Visit `/admin/login` — you should see the sign-in form.
-- Sign in and you should land on `/admin` (the dashboard) showing record
-  counts from the seeded tables.
+- Sign in and open `/platform-admin` to manage schools, users, domains, and
+  platform settings. The `/admin` area manages school content.
+- The neutral starter site and record counts are visible after setup.
 - Visit `/admin/forgot-password` to test the password-reset email flow.
   The reset link points to `/admin/update-password`.
 

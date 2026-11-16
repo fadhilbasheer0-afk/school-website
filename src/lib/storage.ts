@@ -107,11 +107,6 @@ export function buildStoragePath(folderOrSchoolId: string, fileOrFolder: any, ma
   const prefix = cleanSchool ? `${cleanSchool}/` : "";
   return `${prefix}${cleanFolder}/${Date.now()}-${safeName}`;
 }
-  const safeName = sanitizeFileName(file.name);
-  const cleanSchool = schoolId.replace(/^\/+|\/+$/g, "");
-  const cleanFolder = folder.replace(/^\/+|\/+$/g, "");
-  return `${cleanSchool}/${cleanFolder}/${Date.now()}-${safeName}`;
-}
 
 /** True when a MIME type is allowed for the given upload kind. */
 export function isAllowedType(type: string, kind: StorageKind): boolean {
