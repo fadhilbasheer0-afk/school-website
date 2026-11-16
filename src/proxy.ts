@@ -9,20 +9,47 @@ const isSupabaseConfigured = Boolean(
 const AUTH_PAGES = ["/admin/login", "/admin/forgot-password"];
 
 /**
- * Guards the /admin section and keeps the Supabase session fresh by writing
- * refreshed auth cookies onto the response.
+ * Multi-tenant routing proxy & Auth guard.
  *
- * Authorization to the dashboard itself is enforced server-side in
- * src/app/admin/(protected)/layout.tsx via requireAdmin() — the proxy only
- * handles session refresh and the coarse signed-in / signed-out redirects.
+ * 1. Resolves tenant from hostname (subdomain / custom domain) or /s/:slug path.
+ * 2. Injects `x-tenant-slug` and `x-tenant-domain` request headers.
+ * 3. Guards /admin and /platform-admin protected paths.
+ * 4. Refreshes Supabase auth cookies.
  */
 export async function proxy(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers);
+  const { pathname, searchParams } = request.nextUrl;
+  const host = request.headers.get("host") || "";
+
+  // ─── 1. Tenant Resolution ──────────────────────────────────────────
+  let tenantSlug: string | null = null;
+  let tenantDomain: string | null = null;
+
+  // Check /s/:slug prefix
+  const sPathMatch = pathname.match(/^\/s\/([a-zA-Z0-9_-]+)(.*)/);
+  if (sPathMatch) {
+    tenantSlug = sPathMatch[1].toLowerCase();
+  } else if (searchParams.has("school")) {
+    tenantSlug = searchParams.get("school")!.toLowerCase();
+  } else if (host) {
+    const hostname = host.split(":")[0].toLowerCase();
+    const parts = hostname.split(".");
+    if (parts.length > 2 && !["www", "admin", "platform", "api", "app"].includes(parts[0])) {
+      tenantSlug = parts[0];
+    } else if (!["localhost", "127.0.0.1"].includes(hostname) && parts.length >= 2) {
+      tenantDomain = hostname;
+    }
+  }
+
+  if (tenantSlug) requestHeaders.set("x-tenant-slug", tenantSlug);
+  if (tenantDomain) requestHeaders.set("x-tenant-domain", tenantDomain);
+  requestHeaders.set("x-pathname", pathname);
+
   const response = NextResponse.next({
-    request: { headers: request.headers },
+    request: { headers: requestHeaders },
   });
 
-  const { pathname } = request.nextUrl;
-
+  // ─── 2. Auth Guard & Session Refresh ──────────────────────────────
   if (!isSupabaseConfigured) {
     return response;
   }
@@ -48,7 +75,6 @@ export async function proxy(request: NextRequest) {
       },
     });
   } catch {
-    // Malformed env (e.g. accidentally quoted values) → bypass auth guard.
     return response;
   }
 
@@ -57,26 +83,22 @@ export async function proxy(request: NextRequest) {
     const { data } = await supabase.auth.getUser();
     user = data.user;
   } catch {
-    // Supabase unreachable → let the page render; admin routes still enforce
-    // authorization server-side.
     return response;
   }
 
   const isAdminPath = pathname.startsWith("/admin");
+  const isPlatformAdminPath = pathname.startsWith("/platform-admin");
   const isAuthPage = AUTH_PAGES.includes(pathname);
 
-  // Signed out and trying to reach a protected admin page → login.
-  if (!user && isAdminPath && !isAuthPage) {
+  // Unauthenticated user trying to reach protected dashboard
+  if (!user && (isAdminPath || isPlatformAdminPath) && !isAuthPage) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/admin/login";
-    redirectUrl.searchParams.set(
-      "next",
-      pathname + (request.nextUrl.search ?? "")
-    );
+    redirectUrl.searchParams.set("next", pathname + (request.nextUrl.search ?? ""));
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Signed in and visiting a login/forgot-password page → dashboard.
+  // Signed in user visiting login page
   if (user && isAuthPage) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/admin";
@@ -88,5 +110,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/admin/:path*",
+  matcher: [
+    "/admin/:path*",
+    "/platform-admin/:path*",
+    "/s/:path*",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

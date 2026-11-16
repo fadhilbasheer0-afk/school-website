@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
   Shield,
   Sparkles,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { getAboutSections } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 /* ─── data ──────────────────────────────────────────────── */
 
@@ -137,7 +139,11 @@ const managementTeam = [
 /* ─── page ──────────────────────────────────────────────── */
 
 export default async function About() {
-  const sections = await getAboutSections();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "about");
+  if (!enabled) notFound();
+
+  const sections = await getAboutSections(tenant.id);
   const intro = sections.intro;
   const vision = sections.vision;
   const mission = sections.mission;
@@ -151,8 +157,8 @@ export default async function About() {
         <div className="max-w-7xl mx-auto">
           <SectionHeading
             badge="Who We Are"
-            title="About Irshad Academy"
-            subtitle="A community built on over 25 years of academic rigour, personal achievement, and character growth."
+            title={`About ${tenant.name}`}
+            subtitle={`A community built on academic rigour, personal achievement, and character growth.`}
             align="center"
             className="mx-auto"
           />

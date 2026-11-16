@@ -85,7 +85,28 @@ export function sanitizeFileName(name: string): string {
  * Objects live under `{schoolId}/{folder}/{file}` so the storage RLS policy
  * can enforce that admins only write into their own school's folder.
  */
-export function buildStoragePath(schoolId: string, folder: string, file: File): string {
+export function buildStoragePath(folderOrSchoolId: string, fileOrFolder: any, maybeFile?: File): string {
+  // Support legacy signature: buildStoragePath(folder, file)
+  // and new signature: buildStoragePath(schoolId, folder, file)
+  let schoolId = '';
+  let folder: string;
+  let file: File;
+  if (maybeFile !== undefined && fileOrFolder !== undefined) {
+    // Called with three arguments
+    schoolId = folderOrSchoolId;
+    folder = fileOrFolder as string;
+    file = maybeFile;
+  } else {
+    // Called with two arguments (folder, file)
+    folder = folderOrSchoolId;
+    file = fileOrFolder as File;
+  }
+  const safeName = sanitizeFileName(file.name);
+  const cleanSchool = schoolId.replace(/^\/+|\/+$/g, "");
+  const cleanFolder = folder.replace(/^\/+|\/+$/g, "");
+  const prefix = cleanSchool ? `${cleanSchool}/` : "";
+  return `${prefix}${cleanFolder}/${Date.now()}-${safeName}`;
+}
   const safeName = sanitizeFileName(file.name);
   const cleanSchool = schoolId.replace(/^\/+|\/+$/g, "");
   const cleanFolder = folder.replace(/^\/+|\/+$/g, "");

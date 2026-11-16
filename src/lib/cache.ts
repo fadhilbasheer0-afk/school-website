@@ -1,7 +1,7 @@
 /**
- * Shared cache-tag registry for the public content cache.
+ * Shared cache-tag registry for the multi-tenant public content cache.
  *
- * Public fetchers in `@/lib/content` are wrapped in `unstable_cache()` and
+ * Public fetchers in `@/lib/content` and `@/lib/tenant` are wrapped in `unstable_cache()` and
  * tagged with one of these tags. Admin server actions call
  * `revalidateContent()` (@/lib/admin/revalidate) after every write, which
  * invalidates the affected tags and routes so CMS edits appear on the public
@@ -25,6 +25,11 @@ export const CACHE_TAGS = {
   activities: "content-activities",
   achievements: "content-achievements",
   settings: "content-settings",
+  pages: "content-pages",
+  sections: "content-sections",
+  themes: "content-themes",
+  custom_pages: "content-custom-pages",
+  domains: "content-domains",
 } as const;
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
@@ -50,6 +55,7 @@ export const TABLE_CONTENT_MAP: Record<
   home_content: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
   home_hero_slides: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
   home_statistics: { tags: [CACHE_TAGS.home], paths: ["/"], purgeClient: true },
+  school_homepage_sections: { tags: [CACHE_TAGS.sections, CACHE_TAGS.home], paths: ["/"], purgeClient: true },
   achievements: {
     tags: [CACHE_TAGS.achievements, CACHE_TAGS.home],
     paths: ["/", "/activities"],
@@ -70,6 +76,27 @@ export const TABLE_CONTENT_MAP: Record<
   school_settings: {
     tags: [CACHE_TAGS.settings, CACHE_TAGS.home, CACHE_TAGS.contact],
     paths: ["/", "/contact"],
+    purgeClient: true,
+  },
+  school_themes: {
+    tags: [CACHE_TAGS.themes, CACHE_TAGS.settings, CACHE_TAGS.home],
+    paths: ["/"],
+    purgeClient: true,
+  },
+  school_pages: {
+    tags: [CACHE_TAGS.pages, CACHE_TAGS.settings, CACHE_TAGS.home],
+    paths: ["/", "/about", "/academics", "/faculty", "/facilities", "/activities", "/gallery", "/events", "/admissions", "/news", "/contact"],
+    purgeClient: true,
+  },
+  custom_pages: {
+    tags: [CACHE_TAGS.custom_pages],
+    paths: ["/"],
+    pagePatterns: ["/p/[slug]"],
+    purgeClient: true,
+  },
+  school_domains: {
+    tags: [CACHE_TAGS.domains],
+    paths: ["/"],
     purgeClient: true,
   },
   // Directory / content lists

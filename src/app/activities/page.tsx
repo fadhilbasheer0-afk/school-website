@@ -1,12 +1,18 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { Users } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { ActivityDirectory } from "@/components/activities/ActivityDirectory";
 import { getActivities } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 export default async function Activities() {
-  const activities = await getActivities();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "activities");
+  if (!enabled) notFound();
+
+  const activities = await getActivities(tenant.id);
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">

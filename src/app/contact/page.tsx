@@ -1,12 +1,14 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Mail, Phone, MapPin, Clock, ExternalLink, Navigation } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialLinks } from "@/components/contact/SocialLinks";
 import { siteConfig } from "@/lib/site";
 import { getSchoolSettings, getContactInfo } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -25,9 +27,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Contact() {
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "contact");
+  if (!enabled) notFound();
+
   const [settings, contactInfo] = await Promise.all([
-    getSchoolSettings(),
-    getContactInfo(),
+    getSchoolSettings(tenant.id),
+    getContactInfo(tenant.id),
   ]);
 
   const addressEntry = contactInfo.find((e) => e.type === "address");

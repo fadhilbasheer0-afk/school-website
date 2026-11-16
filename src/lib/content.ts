@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
 import { CACHE_TAGS } from "@/lib/cache";
 import { siteConfig } from "@/lib/site";
+import { MOCK_TENANTS } from "@/lib/tenant";
 import {
   newsArticles,
   type NewsArticle,
@@ -169,7 +170,7 @@ function toParagraphs(content: unknown, fallbackParagraph?: string): string[] {
 /**
  * Resolves the default (public) school's id so public reads are scoped to the
  * public tenant. Returns null when the school row is missing — RLS still
- * guarantees only the public school's content is visible anonymously.
+ * guarantees only active schools' content is visible anonymously.
  */
 const DEFAULT_SCHOOL_SLUG = "irshad";
 const DEFAULT_SCHOOL_ID = "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d";
@@ -179,9 +180,16 @@ async function getDefaultSchoolId(client: SupabaseClient): Promise<string | null
     const { data } = await client
       .from("schools")
       .select("id")
+      .eq("is_default", true)
+      .maybeSingle();
+    if (data?.id) return data.id;
+
+    const { data: fallbackSchool } = await client
+      .from("schools")
+      .select("id")
       .eq("slug", DEFAULT_SCHOOL_SLUG)
       .maybeSingle();
-    return data?.id ?? DEFAULT_SCHOOL_ID;
+    return fallbackSchool?.id ?? DEFAULT_SCHOOL_ID;
   } catch {
     return DEFAULT_SCHOOL_ID;
   }
@@ -211,12 +219,16 @@ async function fetchTable<T>(
     orderBy?: string;
     ascending?: boolean;
     scopeSchool?: boolean;
+    schoolId?: string | null;
     eq?: Record<string, unknown>;
     limit?: number;
   }
 ): Promise<T[]> {
   return withClient(async (client) => {
-    const schoolId = options?.scopeSchool === false ? null : await getDefaultSchoolId(client);
+    let schoolId: string | null = null;
+    if (options?.scopeSchool !== false) {
+      schoolId = options?.schoolId || (await getDefaultSchoolId(client));
+    }
     let query = client.from(table).select("*");
     if (schoolId) query = query.eq("school_id", schoolId);
     if (options?.eq) {
@@ -775,37 +787,48 @@ export const getHeroSlides = cacheable(fetchHeroSlides, ["hero-slides"], CACHE_T
 
 /* ─── settings & contact ──────────────────────────────────── */
 
-function fallbackSettings(): SchoolSettings {
+function fallbackSettings(schoolId?: string | null): SchoolSettings {
+  let matchedMock = MOCK_TENANTS.irshad;
+  if (schoolId) {
+    const found = Object.values(MOCK_TENANTS).find(
+      (m) => m.id === schoolId || m.slug === schoolId.toLowerCase()
+    );
+    if (found) matchedMock = found;
+  }
+
   return {
-    schoolName: siteConfig.name,
-    tagline: "International Academy",
-    logoUrl: null,
-    primaryColor: null,
-    contactEmail: siteConfig.email,
-    contactPhone: siteConfig.phoneMain,
-    contactAddress: `${siteConfig.address.street}, ${siteConfig.address.city}`,
-    websiteUrl: siteConfig.url,
+    schoolName: matchedMock.name,
+    tagline: matchedMock.motto || "International Academy",
+    logoUrl: matchedMock.theme.logoUrl,
+    primaryColor: matchedMock.theme.primaryColor,
+    contactEmail: matchedMock.email || siteConfig.email,
+    contactPhone: matchedMock.phone || siteConfig.phoneMain,
+    contactAddress: matchedMock.address || `${siteConfig.address.street}, ${siteConfig.address.city}`,
+    websiteUrl: matchedMock.website || siteConfig.url,
     mapUrl: siteConfig.address.mapEmbedUrl,
     coordinates: siteConfig.address.gps,
-    footerAbout: siteConfig.description,
-    footerCopyright: `© ${new Date().getFullYear()} ${siteConfig.legalName}. All rights reserved.`,
+    footerAbout: matchedMock.motto || siteConfig.description,
+    footerCopyright: `© ${new Date().getFullYear()} ${matchedMock.name}. All rights reserved.`,
     officeHours: siteConfig.officeHours,
     socialLinks: siteConfig.social,
     contactForm: {
       enabled: true,
-      recipientEmail: siteConfig.email,
-      subjectPrefix: "[Website Contact]",
+      recipientEmail: matchedMock.email || siteConfig.email,
+      subjectPrefix: `[${matchedMock.name} Contact]`,
     },
   };
 }
 
-async function fetchSchoolSettings(): Promise<SchoolSettings> {
-  const fallback = fallbackSettings();
+async function fetchSchoolSettings(schoolId?: string | null): Promise<SchoolSettings> {
+  const fallback = fallbackSettings(schoolId);
 
   return withClient(async (client) => {
-    const schoolId = await getDefaultSchoolId(client);
+    let resolvedId = schoolId;
+    if (!resolvedId) {
+      resolvedId = await getDefaultSchoolId(client);
+    }
     let query = client.from("school_settings").select("*");
-    if (schoolId) query = query.eq("school_id", schoolId);
+    if (resolvedId) query = query.eq("school_id", resolvedId);
     const { data, error } = await query.maybeSingle();
     if (error) throw error;
     if (!data) return fallback;

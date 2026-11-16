@@ -1,12 +1,21 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { Camera } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GalleryAlbumDirectory } from "@/components/gallery/GalleryAlbumDirectory";
 import { GalleryDirectory } from "@/components/gallery/GalleryDirectory";
 import { getGalleryAlbums, getGalleryImages } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 export default async function Gallery() {
-  const [albums, images] = await Promise.all([getGalleryAlbums(), getGalleryImages()]);
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "gallery");
+  if (!enabled) notFound();
+
+  const [albums, images] = await Promise.all([
+    getGalleryAlbums(tenant.id),
+    getGalleryImages(undefined, tenant.id),
+  ]);
 
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">

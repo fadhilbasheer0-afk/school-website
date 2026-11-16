@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
   BookOpen,
   BrainCircuit,
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 import { getAcademicData } from "@/lib/content";
 
 /* ─── data ──────────────────────────────────────────────── */
@@ -262,7 +264,11 @@ function departmentIcon(name: string) {
 }
 
 export default async function Academics() {
-  const academic = await getAcademicData();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "academics");
+  if (!enabled) notFound();
+
+  const academic = await getAcademicData(tenant.id);
 
   const gradeColors = [
     "border-t-emerald-500",

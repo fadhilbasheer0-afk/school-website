@@ -1,12 +1,18 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { BellRing } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { EventsList } from "@/components/events/EventsList";
 import { getEvents } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 export default async function Events() {
-  const events = await getEvents();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "events");
+  if (!enabled) notFound();
+
+  const events = await getEvents(tenant.id);
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">

@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
   CheckCircle,
   ClipboardList,
@@ -23,6 +24,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 import { AdmissionsInquiryForm } from "@/components/admissions/AdmissionsInquiryForm";
 import { siteConfig } from "@/lib/site";
 import { getAdmissions } from "@/lib/content";
@@ -178,7 +180,11 @@ const admissionSteps = [
 ];
 
 export default async function Admissions() {
-  const sections = await getAdmissions();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "admissions");
+  if (!enabled) notFound();
+
+  const sections = await getAdmissions(tenant.id);
   const byKey: Record<string, string | undefined> = {};
   for (const s of sections) byKey[s.sectionKey] = s.body;
 

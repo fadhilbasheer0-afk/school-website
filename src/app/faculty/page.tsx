@@ -1,10 +1,16 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FacultyDirectory } from "@/components/faculty/FacultyDirectory";
 import { getTeachers } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 export default async function Faculty() {
-  const members = await getTeachers();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "faculty");
+  if (!enabled) notFound();
+
+  const members = await getTeachers(undefined, tenant.id);
   return (
     <div className="w-full py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-8">

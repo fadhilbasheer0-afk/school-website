@@ -1,10 +1,12 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { Check, Eye, Camera, Building2, type LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
 import { facilities as staticFacilities } from "@/data/facilities";
 import { getFacilities } from "@/lib/content";
+import { resolveTenant, isPageEnabled } from "@/lib/tenant";
 
 const categoryColor: Record<string, string> = {
   Academic: "text-indigo-600 dark:text-indigo-400",
@@ -18,7 +20,11 @@ const iconByTitle = new Map(staticFacilities.map((f) => [f.title, f.icon]));
 const DefaultIcon: LucideIcon = Building2;
 
 export default async function Facilities() {
-  const cmsFacilities = await getFacilities();
+  const tenant = await resolveTenant();
+  const enabled = await isPageEnabled(tenant.id, "facilities");
+  if (!enabled) notFound();
+
+  const cmsFacilities = await getFacilities(undefined, tenant.id);
   const items =
     cmsFacilities.length > 0
       ? cmsFacilities.map((f) => ({

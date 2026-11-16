@@ -49,6 +49,13 @@ export const TABLE_ALLOWLIST = new Set([
   "events",
   "admissions",
   "contact_information",
+  "school_pages",
+  "school_homepage_sections",
+  "custom_pages",
+  "school_themes",
+  "school_domains",
+  "school_subscriptions",
+  "schools",
 ]);
 
 export const assertTable = (table: string) => {
@@ -75,14 +82,19 @@ const FIELD_ALLOWLIST: Record<string, string[]> = {
     "gallery_photos",
     "admissions",
     "contact_information",
+    "schools",
   ],
-  is_published: ["announcements", "events"],
+  is_published: ["announcements", "events", "custom_pages"],
   is_featured: ["announcements", "events"],
+  is_enabled: ["school_pages", "school_homepage_sections"],
+  is_in_nav: ["school_pages", "custom_pages"],
+  is_primary: ["contact_information", "school_domains"],
 };
 
 export async function requireAdminOrNull() {
   const session = await getAdminSession();
   if (!session) return null;
+  if (session.isPlatformAdmin) return session;
   if (session.role !== "owner" && session.role !== "admin") return null;
   return session;
 }

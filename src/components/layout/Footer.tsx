@@ -9,45 +9,83 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/Button";
 import type { SchoolSettings } from "@/lib/content";
+import type { SchoolPageConfig, TenantContext } from "@/lib/tenant";
+import { getTenantUrl } from "@/lib/tenant";
 
-interface FooterLink {
-  label: string;
-  path: string;
+interface FooterProps {
+  settings?: SchoolSettings;
+  pages?: SchoolPageConfig[];
+  tenant?: TenantContext;
 }
 
-const exploreLinks: FooterLink[] = [
-  { label: "About Our School", path: "/about" },
-  { label: "Academic Programs", path: "/academics" },
-  { label: "Faculty Directory", path: "/faculty" },
-  { label: "School Facilities", path: "/facilities" },
-  { label: "Student Activities", path: "/activities" },
-  { label: "Photo Gallery", path: "/gallery" },
-];
-
-const resourceLinks: FooterLink[] = [
-  { label: "Admissions Process", path: "/admissions" },
-  { label: "Latest News", path: "/news" },
-  { label: "Upcoming Events", path: "/events" },
-  { label: "Contact Us", path: "/contact" },
-  { label: "Privacy Policy", path: "#" },
-  { label: "Terms of Service", path: "#" },
-];
-
-export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) => {
-  const schoolName = settings?.schoolName || "IRSHAD";
-  const tagline = settings?.tagline || "International Academy";
-  const logoUrl = settings?.logoUrl || null;
+export const Footer: React.FC<FooterProps> = ({ settings, pages, tenant }) => {
+  const schoolName = settings?.schoolName || tenant?.name || "IRSHAD";
+  const tagline = settings?.tagline || tenant?.motto || "International Academy";
+  const logoUrl = settings?.logoUrl || tenant?.theme?.logoUrl || null;
   const footerAbout =
     settings?.footerAbout ||
-    "Providing a legacy of academic excellence, personal growth, and global citizenship. Empowering students since 1995.";
-  const address = settings?.contactAddress || "125 Academy Road, New York, NY 10024";
-  const phone = settings?.contactPhone || "+1 (800) 555-0199";
-  const email = settings?.contactEmail || "info@irshadacademy.edu";
+    tenant?.motto ||
+    "Providing a legacy of academic excellence, personal growth, and global citizenship.";
+  const address = settings?.contactAddress || tenant?.address || "125 Academy Road, New York, NY 10024";
+  const phone = settings?.contactPhone || tenant?.phone || "+1 (800) 555-0199";
+  const email = settings?.contactEmail || tenant?.email || "info@irshadacademy.edu";
   const copyright =
     settings?.footerCopyright ||
-    `© ${new Date().getFullYear()} Irshad International Academy. All Rights Reserved.`;
+    `© ${new Date().getFullYear()} ${schoolName}. All Rights Reserved.`;
   const socialLinks = settings?.socialLinks || {};
   const year = new Date().getFullYear();
+
+  const tCtx: TenantContext = tenant ?? {
+    id: "default",
+    slug: "irshad",
+    name: schoolName,
+    motto: tagline,
+    establishedYear: 1995,
+    address,
+    phone,
+    email,
+    website: null,
+    isActive: true,
+    subscriptionTier: "pro",
+    theme: {
+      primaryColor: "#0f172a",
+      secondaryColor: "#1e293b",
+      accentColor: "#d97706",
+      fontFamily: "sans",
+      logoUrl: null,
+      faviconUrl: null,
+      bannerUrl: null,
+    },
+    isPathScoped: false,
+  };
+
+  // Build footer links based on enabled pages
+  const exploreKeys = ["about", "academics", "faculty", "facilities", "activities", "gallery"];
+  const resourceKeys = ["admissions", "news", "events", "contact"];
+
+  const exploreLinks = pages
+    ? pages
+        .filter((p) => exploreKeys.includes(p.pageKey) && p.isEnabled !== false)
+        .map((p) => ({ label: p.title, path: getTenantUrl(tCtx, `/${p.slug}`) }))
+    : [
+        { label: "About Our School", path: getTenantUrl(tCtx, "/about") },
+        { label: "Academic Programs", path: getTenantUrl(tCtx, "/academics") },
+        { label: "Faculty Directory", path: getTenantUrl(tCtx, "/faculty") },
+        { label: "School Facilities", path: getTenantUrl(tCtx, "/facilities") },
+        { label: "Student Activities", path: getTenantUrl(tCtx, "/activities") },
+        { label: "Photo Gallery", path: getTenantUrl(tCtx, "/gallery") },
+      ];
+
+  const resourceLinks = pages
+    ? pages
+        .filter((p) => resourceKeys.includes(p.pageKey) && p.isEnabled !== false)
+        .map((p) => ({ label: p.title, path: getTenantUrl(tCtx, `/${p.slug}`) }))
+    : [
+        { label: "Admissions Process", path: getTenantUrl(tCtx, "/admissions") },
+        { label: "Latest News", path: getTenantUrl(tCtx, "/news") },
+        { label: "Upcoming Events", path: getTenantUrl(tCtx, "/events") },
+        { label: "Contact Us", path: getTenantUrl(tCtx, "/contact") },
+      ];
 
   const socialItems = [
     { label: "Facebook", href: socialLinks.facebook ?? "#", icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg> },
@@ -71,26 +109,31 @@ export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <Link href="/admissions">
+            <Link href={getTenantUrl(tCtx, "/admissions")}>
               <Button variant="secondary" className="w-full text-center">
                 Apply Now
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link href={getTenantUrl(tCtx, "/contact")}>
               <Button variant="outline" className="w-full text-center text-white border-slate-700 hover:bg-slate-800">
-                Contact Admissions
+                Contact Us
               </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto py-16 px-6 md:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 font-sans">
-        {/* About, Contact & Social Info */}
-        <div className="flex flex-col gap-6">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-md overflow-hidden">
+      {/* Main Footer Directory */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        {/* Brand Column */}
+        <div className="lg:col-span-2 flex flex-col space-y-4">
+          <Link href={getTenantUrl(tCtx, "/")} className="flex items-center gap-3 group">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 overflow-hidden"
+              style={{
+                backgroundColor: tenant?.theme?.primaryColor || "#0f172a",
+              }}
+            >
               {logoUrl ? (
                 <img
                   src={logoUrl}
@@ -102,26 +145,31 @@ export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
               )}
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-lg tracking-tight text-white leading-none">
+              <span className="font-extrabold text-xl tracking-tight text-white leading-none">
                 {schoolName}
               </span>
-              <span className="text-[10px] uppercase font-semibold text-amber-500 tracking-widest mt-1">
+              <span
+                className="text-[10px] uppercase font-semibold tracking-widest mt-1"
+                style={{
+                  color: tenant?.theme?.accentColor || "#d97706",
+                }}
+              >
                 {tagline}
               </span>
             </div>
           </Link>
-          <p className="text-sm text-slate-400 leading-relaxed font-light">
+          <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
             {footerAbout}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pt-2">
             {socialItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500 hover:text-amber-500 text-slate-400 transition-all duration-300 flex items-center justify-center"
-                aria-label={`${schoolName} on ${item.label}`}
+                className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                aria-label={`Visit our ${item.label} page`}
               >
                 {item.icon}
               </a>
@@ -129,19 +177,19 @@ export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
           </div>
         </div>
 
-        {/* Explore Links */}
+        {/* Column 1: Explore */}
         <div>
-          <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-6">
+          <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
             Explore
           </h4>
-          <ul className="flex flex-col gap-3.5 text-sm font-medium">
+          <ul className="space-y-2 text-sm">
             {exploreLinks.map((link) => (
               <li key={link.label}>
                 <Link
                   href={link.path}
-                  className="hover:text-amber-400 hover:translate-x-1.5 transition-all duration-300 flex items-center gap-1.5"
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 group"
                 >
-                  <ArrowRight className="w-3 h-3 text-slate-700" />
+                  <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-amber-500 transition-colors" />
                   <span>{link.label}</span>
                 </Link>
               </li>
@@ -149,19 +197,19 @@ export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
           </ul>
         </div>
 
-        {/* Resources & Policy Links */}
+        {/* Column 2: Resources */}
         <div>
-          <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-6">
+          <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
             Resources
           </h4>
-          <ul className="flex flex-col gap-3.5 text-sm font-medium">
+          <ul className="space-y-2 text-sm">
             {resourceLinks.map((link) => (
               <li key={link.label}>
                 <Link
                   href={link.path}
-                  className="hover:text-amber-400 hover:translate-x-1.5 transition-all duration-300 flex items-center gap-1.5"
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 group"
                 >
-                  <ArrowRight className="w-3 h-3 text-slate-700" />
+                  <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-amber-500 transition-colors" />
                   <span>{link.label}</span>
                 </Link>
               </li>
@@ -169,48 +217,44 @@ export const Footer: React.FC<{ settings?: SchoolSettings }> = ({ settings }) =>
           </ul>
         </div>
 
-        {/* Contact Info */}
-        <div className="flex flex-col gap-6 text-sm">
-          <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-            Contact
+        {/* Column 3: Contact */}
+        <div className="flex flex-col space-y-3">
+          <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-1 border-b border-slate-800 pb-2">
+            Contact Us
           </h4>
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-3.5">
-              <MapPin className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
-              <p className="text-slate-400 leading-relaxed font-light">
-                {address}
-              </p>
-            </div>
-            <div className="flex items-center gap-3.5">
-              <Phone className="w-5 h-5 text-amber-500 shrink-0" />
-              <a
-                href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-                className="text-slate-400 hover:text-amber-400 transition-colors font-light"
-              >
-                {phone}
-              </a>
-            </div>
-            <div className="flex items-center gap-3.5">
-              <Mail className="w-5 h-5 text-amber-500 shrink-0" />
-              <a
-                href={`mailto:${email}`}
-                className="text-slate-400 hover:text-amber-400 transition-colors font-light"
-              >
-                {email}
-              </a>
-            </div>
+          <div className="flex items-start gap-2.5 text-xs md:text-sm text-slate-400">
+            <MapPin className="w-4 h-4 shrink-0 text-amber-500 mt-0.5" />
+            <span>{address}</span>
+          </div>
+          <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
+            <Phone className="w-4 h-4 shrink-0 text-amber-500" />
+            <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="hover:text-white transition-colors">
+              {phone}
+            </a>
+          </div>
+          <div className="flex items-center gap-2.5 text-xs md:text-sm text-slate-400">
+            <Mail className="w-4 h-4 shrink-0 text-amber-500" />
+            <a href={`mailto:${email}`} className="hover:text-white transition-colors">
+              {email}
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Copyright & Subscriptions */}
-      <div className="border-t border-slate-900 py-6 px-6 md:px-8 text-center text-xs text-slate-500">
-        <p className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>{copyright}</span>
-          <span className="text-slate-600 font-light flex items-center gap-1.5">
-            © {year} {schoolName}
-          </span>
-        </p>
+      {/* Bottom Legal bar */}
+      <div className="border-t border-slate-900 py-6 px-6 md:px-8 text-xs text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
+        <p>{copyright}</p>
+        <div className="flex items-center gap-6">
+          <Link href={getTenantUrl(tCtx, "/contact")} className="hover:text-slate-400 transition-colors">
+            Support
+          </Link>
+          <Link href="/admin" className="hover:text-slate-400 transition-colors">
+            Institution Portal
+          </Link>
+          <Link href="/platform-admin" className="hover:text-slate-400 transition-colors">
+            Super Admin
+          </Link>
+        </div>
       </div>
     </footer>
   );

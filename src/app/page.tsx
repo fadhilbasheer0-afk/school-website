@@ -35,6 +35,7 @@ import {
   getFacilities,
   getGalleryImages,
 } from "@/lib/content";
+import { resolveTenant, getSchoolHomepageSections, getTenantUrl } from "@/lib/tenant";
 
 /* ─── static fallbacks ──────────────────────────────────── */
 
@@ -239,6 +240,11 @@ function achievementIcon(category: string) {
 /* ─── page component ────────────────────────────────────── */
 
 export default async function Home() {
+  const tenant = await resolveTenant();
+  const homepageSections = await getSchoolHomepageSections(tenant.id);
+  const isSectionEnabled = (key: string) =>
+    homepageSections.find((s) => s.sectionKey === key)?.isEnabled ?? true;
+
   const [
     stats,
     heroSlides,
@@ -248,13 +254,13 @@ export default async function Home() {
     facilities,
     galleryImages,
   ] = await Promise.all([
-    getHomeStats(),
-    getHeroSlides(),
-    getAnnouncements(),
-    getEvents(),
-    getAchievements(),
-    getFacilities(),
-    getGalleryImages(),
+    getHomeStats(tenant.id),
+    getHeroSlides(tenant.id),
+    getAnnouncements(undefined, tenant.id),
+    getEvents(tenant.id),
+    getAchievements(tenant.id),
+    getFacilities(undefined, tenant.id),
+    getGalleryImages(undefined, tenant.id),
   ]);
 
   const hero = heroSlides?.[0] ?? staticHero;
@@ -314,153 +320,165 @@ export default async function Home() {
   return (
     <div className="w-full flex flex-col font-sans">
       {/* ════════ 1 · HERO ════════ */}
-      <section
-        id="hero"
-        className="relative bg-slate-950 text-white overflow-hidden py-24 lg:py-32 px-6 md:px-8 border-b border-slate-900"
-      >
-        {/* radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-950/10 to-slate-950 pointer-events-none" />
+      {isSectionEnabled("hero") && (
+        <section
+          id="hero"
+          className="relative bg-slate-950 text-white overflow-hidden py-24 lg:py-32 px-6 md:px-8 border-b border-slate-900"
+        >
+          {/* radial glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-950/10 to-slate-950 pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
-          {/* left text */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left">
-            {/* school identity */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg">
-                <GraduationCap className="w-7 h-7" />
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
+            {/* left text */}
+            <div className="lg:col-span-7 flex flex-col items-start text-left">
+              {/* school identity */}
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg"
+                  style={{
+                    backgroundColor: tenant.theme.primaryColor || "#0f172a",
+                  }}
+                >
+                  <GraduationCap className="w-7 h-7" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-lg font-extrabold tracking-tight leading-none text-white">
+                    {tenant.name}
+                  </span>
+                  <span
+                    className="text-[10px] uppercase font-semibold tracking-[0.2em] mt-0.5"
+                    style={{
+                      color: tenant.theme.accentColor || "#d97706",
+                    }}
+                  >
+                    {tenant.motto || "International Academy"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-extrabold tracking-tight leading-none text-white">
-                  IRSHAD
-                </span>
-                <span className="text-[10px] uppercase font-semibold text-amber-500 tracking-[0.2em] mt-0.5">
-                  International Academy
-                </span>
+
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-5 uppercase tracking-widest">
+                Admissions Open for 2026–27
+              </span>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
+                {hero.title || `Empowering Future Leaders at ${tenant.name}`}
+              </h1>
+
+              <p className="text-slate-400 mt-6 text-base md:text-lg leading-relaxed max-w-xl">
+                {heroSubtitle}
+              </p>
+
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
+                <Link href={getTenantUrl(tenant, heroCtaUrl || "/admissions")}>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full sm:w-auto justify-center"
+                  >
+                    {heroCtaLabel}
+                  </Button>
+                </Link>
+                <Link href={getTenantUrl(tenant, "/about")}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto justify-center text-white border-slate-700 hover:bg-slate-900"
+                  >
+                    Explore Our Campus
+                  </Button>
+                </Link>
               </div>
             </div>
 
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-5 uppercase tracking-widest">
-              Admissions Open for 2026–27
-            </span>
-
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
-              {hero.title || "Nurturing Minds, Inspiring Futures"}
-            </h1>
-
-            <p className="text-slate-400 mt-6 text-base md:text-lg leading-relaxed max-w-xl">
-              {heroSubtitle}
-            </p>
-
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
-              <Link href={heroCtaUrl || "/admissions"}>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto justify-center"
-                >
-                  {heroCtaLabel}
-                </Button>
-              </Link>
-              <Link href="/about">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto justify-center text-white border-slate-700 hover:bg-slate-900"
-                >
-                  Explore Our Campus
-                </Button>
-              </Link>
+            {/* right hero image */}
+            <div className="lg:col-span-5 w-full">
+              <ImagePlaceholder
+                label={`${tenant.name} Main Campus — Front Entrance and Academic Block`}
+                src={heroImage}
+                aspectRatio="aspect-[4/3]"
+                className="shadow-2xl shadow-slate-950/60 border-slate-800"
+                icon={<Building className="w-12 h-12 text-slate-600" />}
+              />
             </div>
           </div>
-
-          {/* right hero image */}
-          <div className="lg:col-span-5 w-full">
-            <ImagePlaceholder
-              label="Irshad Main Campus — Front Entrance and Academic Block"
-              src={heroImage}
-              aspectRatio="aspect-[4/3]"
-              className="shadow-2xl shadow-slate-950/60 border-slate-800"
-              icon={<Building className="w-12 h-12 text-slate-600" />}
-            />
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ════════ 2 · STATISTICS ════════ */}
-      <section
-        id="stats"
-        className="bg-slate-900 text-white py-12 px-6 md:px-8 border-b border-slate-800"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-6">
-            {statItems.map((s, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <span className="text-3xl md:text-4xl font-black text-amber-500 tracking-tight">
-                  {s.number}
-                </span>
-                <span className="text-[11px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest mt-2">
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════ 3 · SCHOOL INTRODUCTION ════════ */}
-      <section
-        id="introduction"
-        className="py-20 lg:py-28 px-6 md:px-8 bg-white dark:bg-slate-950"
-      >
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
-          <div className="lg:col-span-7 flex flex-col gap-5 text-left">
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-              Welcome to Irshad
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
-              A Legacy of Excellence Since 1995
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              For over twenty-five years, Irshad International Academy has
-              set the standard for holistic education. Our rigorous academic
-              programs, combined with a wide range of co-curricular activities,
-              develop confident, caring, and creative young people who are
-              prepared to succeed in an ever-changing world.
-            </p>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Set on a beautiful 20-acre campus, our school is home to more than
-              1,200 students representing 35 nationalities. We offer the
-              International Baccalaureate Diploma, Cambridge IGCSE pathways, and
-              Advanced Placement courses — all delivered by a faculty of over 100
-              passionate educators.
-            </p>
-            <div className="flex flex-wrap gap-3 mt-2">
-              <Link href="/about">
-                <Button variant="primary">
-                  Learn More About Us
-                </Button>
-              </Link>
-              <Link href="/facilities">
-                <Button
-                  variant="outline"
-                  leftIcon={<Building className="w-4 h-4" />}
-                >
-                  Virtual Campus Tour
-                </Button>
-              </Link>
+      {isSectionEnabled("stats") && (
+        <section
+          id="stats"
+          className="bg-slate-900 text-white py-12 px-6 md:px-8 border-b border-slate-800"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-6">
+              {statItems.map((s, i) => (
+                <div key={i} className="flex flex-col items-center text-center">
+                  <span className="text-3xl md:text-4xl font-black text-amber-500 tracking-tight">
+                    {s.number}
+                  </span>
+                  <span className="text-[11px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest mt-2">
+                    {s.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
+        </section>
+      )}
+
+      {/* ════════ 3 · SCHOOL INTRODUCTION ════════ */}
+      {isSectionEnabled("about_preview") && (
+        <section
+          id="introduction"
+          className="py-20 lg:py-28 px-6 md:px-8 bg-white dark:bg-slate-950"
+        >
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+            <div className="lg:col-span-7 flex flex-col gap-5 text-left">
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                Welcome to {tenant.name}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                A Legacy of Academic Excellence
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                At {tenant.name}, we set the standard for holistic education. Our rigorous academic
+                programs, combined with a wide range of co-curricular activities,
+                develop confident, caring, and creative young people who are
+                prepared to succeed in an ever-changing world.
+              </p>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Set on a vibrant campus, our school is dedicated to student-centered learning,
+                modern labs, and international pathways — all delivered by our passionate faculty.
+              </p>
+              <div className="flex flex-wrap gap-3 mt-2">
+                <Link href={getTenantUrl(tenant, "/about")}>
+                  <Button variant="primary">
+                    Learn More About Us
+                  </Button>
+                </Link>
+                <Link href={getTenantUrl(tenant, "/facilities")}>
+                  <Button
+                    variant="outline"
+                    leftIcon={<Building className="w-4 h-4" />}
+                  >
+                    Virtual Campus Tour
+                  </Button>
+                </Link>
+              </div>
+            </div>
 
           <div className="lg:col-span-5">
             <ImagePlaceholder
-              label="Aerial view of Irshad campus showing academic blocks, sports fields, and gardens"
+              label={`Aerial view of ${tenant.name} campus showing academic blocks, sports fields, and gardens`}
               aspectRatio="aspect-[4/3]"
               icon={<Globe className="w-10 h-10 text-slate-400" />}
             />
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 4 · PRINCIPAL'S MESSAGE ════════ */}
       <section
@@ -498,18 +516,18 @@ export default async function Home() {
               A Message from Our Principal
             </h2>
             <blockquote className="border-l-4 border-amber-500 pl-5 text-slate-600 dark:text-slate-400 leading-relaxed italic">
-              &ldquo;At Irshad, we believe that every child is capable of
+              &ldquo;At {tenant.name}, we believe that every student is capable of
               extraordinary things. Our role as educators is not merely to
               impart knowledge, but to ignite a passion for lifelong learning.
               We cultivate an environment where curiosity is encouraged,
               creativity is celebrated, and character is paramount.&rdquo;
             </blockquote>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Our dedicated team of educators works closely with families to
+              Our dedicated team works closely with families to
               ensure that each student receives the support and challenge
               they need to thrive. Whether your child is just beginning their
-              educational journey or preparing for university, Irshad
-              Academy offers a nurturing yet rigorous path forward.
+              educational journey or preparing for university, {tenant.name}
+              offers a nurturing yet rigorous path forward.
             </p>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               I warmly invite you to visit our campus, meet our teachers, and
@@ -517,7 +535,7 @@ export default async function Home() {
               together.
             </p>
             <div className="mt-2">
-              <Link href="/contact">
+              <Link href={getTenantUrl(tenant, "/contact")}>
                 <Button variant="outline" size="sm">
                   Schedule a Campus Visit
                 </Button>
@@ -528,6 +546,7 @@ export default async function Home() {
       </section>
 
       {/* ════════ 5 · CORE VALUES / PILLARS ════════ */}
+      {isSectionEnabled("academics_preview") && (
       <section
         id="values"
         className="py-20 lg:py-28 px-6 md:px-8 bg-white dark:bg-slate-950"
@@ -535,7 +554,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <SectionHeading
             badge="Our Pillars"
-            title="The Irshad Approach"
+            title={`The ${tenant.name} Approach`}
             subtitle="We provide a balanced education focused on intellectual growth, physical development, and ethical leadership."
             align="center"
           />
@@ -547,7 +566,7 @@ export default async function Home() {
                 color: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400",
                 title: "Academic Excellence",
                 desc: "Advanced Placement, IB Diploma, and Cambridge IGCSE pathways taught by experienced, specialist educators — preparing students for the world's top universities.",
-                link: "/academics",
+                link: getTenantUrl(tenant, "/academics"),
                 linkColor: "text-indigo-600 dark:text-indigo-400",
               },
               {
@@ -555,7 +574,7 @@ export default async function Home() {
                 color: "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400",
                 title: "Holistic Development",
                 desc: "Forty-plus clubs, competitive athletics, and performing arts programs ensure every student discovers their unique strengths beyond the classroom.",
-                link: "/activities",
+                link: getTenantUrl(tenant, "/activities"),
                 linkColor: "text-amber-600 dark:text-amber-400",
               },
               {
@@ -563,7 +582,7 @@ export default async function Home() {
                 color: "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400",
                 title: "Global Citizenship",
                 desc: "Community service, multicultural festivals, and exchange programs build empathy, cultural awareness, and the ethical compass to lead responsibly.",
-                link: "/about",
+                link: getTenantUrl(tenant, "/about"),
                 linkColor: "text-emerald-600 dark:text-emerald-400",
               },
             ].map((pillar, i) => (
@@ -591,8 +610,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 6 · FEATURED ANNOUNCEMENTS ════════ */}
+      {isSectionEnabled("news_preview") && (
       <section
         id="announcements"
         className="py-20 lg:py-28 px-6 md:px-8 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/50 dark:border-slate-800/50"
@@ -608,7 +629,7 @@ export default async function Home() {
               </h2>
             </div>
             <Link
-              href="/news"
+              href={getTenantUrl(tenant, "/news")}
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 group shrink-0"
             >
               View All News
@@ -645,7 +666,7 @@ export default async function Home() {
                 </CardContent>
                 <CardFooter>
                   <Link
-                    href="/news"
+                    href={getTenantUrl(tenant, "/news")}
                     className="text-sm font-bold text-indigo-600 dark:text-indigo-400 inline-flex items-center gap-1 group"
                   >
                     Read More
@@ -657,8 +678,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 7 · FEATURED EVENTS ════════ */}
+      {isSectionEnabled("events_preview") && (
       <section
         id="events"
         className="py-20 lg:py-28 px-6 md:px-8 bg-white dark:bg-slate-950"
@@ -674,7 +697,7 @@ export default async function Home() {
               </h2>
             </div>
             <Link
-              href="/events"
+              href={getTenantUrl(tenant, "/events")}
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 group shrink-0"
             >
               Full Calendar
@@ -716,8 +739,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 8 · FEATURED ACHIEVEMENTS ════════ */}
+      {isSectionEnabled("achievements_preview") && (
       <section
         id="achievements"
         className="py-20 lg:py-28 px-6 md:px-8 bg-slate-950 text-white border-y border-slate-900"
@@ -752,8 +777,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 9 · FEATURED FACILITIES ════════ */}
+      {isSectionEnabled("facilities_preview") && (
       <section
         id="facilities"
         className="py-20 lg:py-28 px-6 md:px-8 bg-white dark:bg-slate-950"
@@ -769,7 +796,7 @@ export default async function Home() {
               </h2>
             </div>
             <Link
-              href="/facilities"
+              href={getTenantUrl(tenant, "/facilities")}
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 group shrink-0"
             >
               View All Facilities
@@ -797,8 +824,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 10 · GALLERY PREVIEW ════════ */}
+      {isSectionEnabled("gallery_preview") && (
       <section
         id="gallery-preview"
         className="py-20 lg:py-28 px-6 md:px-8 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/50 dark:border-slate-800/50"
@@ -810,11 +839,11 @@ export default async function Home() {
                 Campus Snapshots
               </span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">
-                Life at Irshad
+                Life at {tenant.name}
               </h2>
             </div>
             <Link
-              href="/gallery"
+              href={getTenantUrl(tenant, "/gallery")}
               className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 group shrink-0"
             >
               Full Gallery
@@ -840,8 +869,10 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════ 11 · ADMISSIONS CTA ════════ */}
+      {isSectionEnabled("admissions_cta") && (
       <section
         id="admissions-cta"
         className="bg-slate-950 text-white py-20 lg:py-28 px-6 md:px-8"
@@ -851,16 +882,16 @@ export default async function Home() {
             <GraduationCap className="w-7 h-7 text-amber-500" />
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
-            Begin Your Child&rsquo;s Journey at Irshad
+            Begin Your Child&rsquo;s Journey at {tenant.name}
           </h2>
           <p className="text-slate-400 max-w-2xl leading-relaxed">
-            Applications for the 2026–27 academic year are now open. Schedule a
+            Applications for the upcoming academic year are now open. Schedule a
             campus visit, speak with our admissions counsellors, or submit an
             inquiry online. We look forward to welcoming your family to the
-            Irshad community.
+            {` ${tenant.name} `}community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <Link href="/admissions">
+            <Link href={getTenantUrl(tenant, "/admissions")}>
               <Button
                 variant="secondary"
                 size="lg"
@@ -869,11 +900,19 @@ export default async function Home() {
                 Start Your Application
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link href={getTenantUrl(tenant, "/contact")}>
               <Button
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto text-white border-slate-700 hover:bg-slate-900"
+              >
+                Contact Admissions
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+      )}
               >
                 Contact Admissions
               </Button>
