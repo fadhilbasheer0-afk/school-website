@@ -76,7 +76,7 @@ export const MOCK_TENANTS: Record<string, TenantContext> = {
   "demo-school": {
     id: "7a04d7c8-4b8e-4f0d-9f3c-2f6f6e4a1b5d",
     slug: "demo-school",
-    name: "Demo School",
+    name: "School",
     motto: null,
     establishedYear: null,
     address: null,
@@ -98,7 +98,7 @@ export const MOCK_TENANTS: Record<string, TenantContext> = {
   "sample-school": {
     id: "8b15e8d9-5c9f-5a1e-8f4d-3a7a7e5b2c6e",
     slug: "sample-school",
-    name: "Sample School",
+    name: "School",
     motto: null,
     establishedYear: null,
     address: null,
@@ -120,7 +120,7 @@ export const MOCK_TENANTS: Record<string, TenantContext> = {
   "example-school": {
     id: "9c26f9ea-6da0-6b2f-9a5e-4b8b8f6c3d7f",
     slug: "example-school",
-    name: "Example School",
+    name: "School",
     motto: null,
     establishedYear: null,
     address: null,

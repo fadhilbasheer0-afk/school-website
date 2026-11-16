@@ -48,7 +48,7 @@ export default async function PlatformAuditPage() {
         actorEmail: "superadmin@example.com",
         targetType: "school",
         targetId: "demo-school",
-        details: { name: "Demo School", tier: "pro" },
+        details: { name: "School", tier: "pro" },
         createdAt: new Date().toISOString(),
       },
       {

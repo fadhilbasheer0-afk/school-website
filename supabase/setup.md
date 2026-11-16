@@ -5,14 +5,12 @@ The project includes a complete SQL schema (`schema.sql`) and the auth
 infrastructure for the `/admin` area. No code is written in this guide — you
 only point Supabase at your project and run the schema.
 
-## 1. Create a Supabase project
+## 1. Select the Supabase project
 
-1. Sign in at <https://supabase.com> and create a new project (or reuse an
-   existing one).
-2. Note the project region — choose one close to your audience.
-3. From the dashboard, open **Project Settings → API** and copy:
+1. Sign in at <https://supabase.com> and open the project you want to use.
+2. From the dashboard, open **Project Settings → API Keys** and copy:
    - **Project URL** (e.g. `https://abcdefghijklmnopqrst.supabase.co`)
-   - **anon / public** key
+   - **anon / publishable** key
 
 ## 2. Configure environment variables
 
@@ -26,7 +24,7 @@ only point Supabase at your project and run the schema.
 
    ```dotenv
    NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
    ```
 
 3. The optional `SUPABASE_SERVICE_ROLE_KEY` is **server-only** tooling
@@ -38,22 +36,25 @@ only point Supabase at your project and run the schema.
 
 > `.env.local` is git-ignored. Only `.env.example` (no secrets) is committed.
 
-## 3. Run the schema
+## 3. Set up the existing database
 
 1. Open **Supabase Dashboard → SQL Editor → New query**.
-2. Paste the entire contents of `supabase/schema.sql`.
-3. Click **Run**.
+2. Do not rerun `supabase/schema.sql` on an existing database. It is only for
+   an empty project.
+3. Check whether `20261116_multi_tenant_saas.sql` has already been applied. If
+   its tables/functions are missing, run it once to add platform admin support.
+4. Run `supabase/migrations/20261116190000_neutral_platform_defaults.sql` if it
+   has not already been applied.
+5. Run `supabase/refresh_existing_school.sql` to clear old school identity,
+   contact details, domains, invitations, and CMS content. It preserves account
+   profiles, platform-admin assignments, subscriptions, and audit history.
 
-The schema creates the core tables, indexes, triggers, Row Level Security
-(RLS) policies, storage buckets, and neutral starter content. For a new
-project, then run these SQL files in order:
+For an empty project only, run `supabase/schema.sql` first, then the two
+migrations above. The schema creates the core tables, policies, storage
+buckets, and starter content.
 
-1. `supabase/migrations/20261116_multi_tenant_saas.sql`
-2. `supabase/migrations/20261116190000_neutral_platform_defaults.sql`
-
-Skip the older August rebrand migration for a new project. For an existing
-database, apply only migrations that have not already been run; do not rerun
-the full schema.
+Apply only migrations that have not already been run. Do not rerun the full
+schema or historical rebrand migrations on an existing database.
 
 > The migration `20260812_rebrand_pinecrest_to_irshad.sql` is retained for
 > databases created by an earlier version. Do not rerun historical migrations
@@ -98,6 +99,10 @@ public; `school-media` is kept for legacy/manual uploads.
 
 Required folders in `school-assets` are created by `schema.sql`; if a folder is
 missing, the uploader creates it on demand.
+
+The refresh script clears database references to old school images. It does
+not delete the underlying files from Storage buckets; remove old files from
+**Storage → school-assets** if they also need to be permanently removed.
 
 ## Troubleshooting
 

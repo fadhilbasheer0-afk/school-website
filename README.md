@@ -39,14 +39,15 @@ one Next.js application and Supabase database.
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env.local` and configure the Supabase URL and
    anonymous key. The service role key is optional and must remain server-only.
-3. In the Supabase SQL editor, apply `supabase/schema.sql`, then
-   `supabase/migrations/20261116_multi_tenant_saas.sql`, then
-   `supabase/migrations/20261116190000_neutral_platform_defaults.sql`. Skip the
-   older August rebrand migration for a new project.
-4. Add `fadhilbasheer0@gmail.com` under **Authentication → Users**.
+3. For an existing Supabase database, do not rerun `supabase/schema.sql`.
+   Apply only missing migrations, then run `supabase/refresh_existing_school.sql`
+   to remove the old school identity and CMS data while keeping account and
+   audit records. See `supabase/setup.md` for the exact order.
+4. Add `fadhilbasheer0@gmail.com` under **Authentication → Users** if the user
+   does not already exist.
 5. Run `supabase/bootstrap_super_admin.sql` in the SQL editor to grant that
    account platform-wide administrator access.
-6. Add the Supabase URL and anon key to `.env.local`, then start with
+6. Add the Supabase URL and public anon key to `.env.local`, then start with
    `npm run dev` and visit `/platform-admin`.
 
 ## Scripts

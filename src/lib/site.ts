@@ -5,8 +5,8 @@
 type SiteSocialLinks = Partial<Record<"facebook" | "twitter" | "instagram" | "linkedin" | "youtube", string>>;
 
 export const siteConfig = {
-  name: "Demo School",
-  legalName: "Demo School",
+  name: "School",
+  legalName: "School",
   url: "https://example.edu",
   description: "A school website powered by a customizable multi-tenant platform.",
   locale: "en_US",
