@@ -1,0 +1,85 @@
+# Irshad Academy — School Website
+
+A production-ready school website built with the Next.js App Router, featuring a
+public marketing site and a password-protected admin CMS backed by Supabase.
+
+## Tech Stack
+
+- **Next.js 16** (App Router, React 19, TypeScript)
+- **Tailwind CSS 4**
+- **Supabase** — Postgres, Auth (email/password), RLS, Storage
+- **next/cache** + `unstable_cache` for CMS-backed content with tag-based revalidation
+
+## What's included
+
+**Public site** — Home, About, Academics, Admissions, Faculty, Facilities,
+Activities, Gallery, Events, News, Contact. Every section reads from Supabase
+and falls back to the static seed data in `src/data` when Supabase is
+unconfigured or a table is empty.
+
+**Admin CMS** (`/admin`) — Login, dashboard, and editors for every content area:
+home, about, academics, admissions, faculty, facilities, activities, gallery,
+news, events, contact, and site settings. Admin writes revalidate the affected
+public routes immediately.
+
+## Getting started
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a Supabase project, then configure the environment:
+
+   ```bash
+   copy .env.example .env.local
+   ```
+
+   Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   (Dashboard → Project Settings → API). `SUPABASE_SERVICE_ROLE_KEY` is
+   optional and server-only.
+
+3. Run the database schema in **Supabase Dashboard → SQL Editor** by pasting the
+   contents of `supabase/schema.sql`. It creates all tables, RLS policies,
+   triggers, storage buckets, and the seed content.
+
+4. Start the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Create your first admin (see `supabase/setup.md`):
+
+   ```sql
+   update public.profiles
+   set role = 'admin'
+   where email = 'you@example.com';
+   ```
+
+   Then sign in at `/admin/login`.
+
+## Scripts
+
+```bash
+npm run dev       # development server
+npm run build     # production build
+npm run start     # run the production build
+npm run lint      # eslint
+```
+
+## Deployment
+
+Deploy the `main` branch to Vercel and set the same environment variables in
+the project settings. The build statically prerenders all public routes and
+revalidates them on a 60s cycle or when the CMS pushes updates.
+
+## Notes
+
+- **Branding** — default branding is "Irshad Academy". Site-wide identity lives
+  in `src/lib/site.ts`; content overrides live in the `school_settings` table.
+- **Rebranding an existing database** — if your Supabase project was seeded
+  while the project was still branded "Pinecrest Academy", run
+  `supabase/migrations/20260812_rebrand_pinecrest_to_irshad.sql` (see
+  `supabase/setup.md`). Safe to re-run.
